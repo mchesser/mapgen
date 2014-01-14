@@ -65,11 +65,7 @@ impl UpperMap {
         simulate_ocean_flow(&land_map, &mut ocean_flow);
         
         
-        // TODO:
-        // - Add weather simulation
-        // - A
-        
-        // !!! FIXME: Maps are lower resolution than input amount, they should be upscaled using
+        // !!! FIXME: Maps are lower resolution than input amount, they should be up-scaled using
         // some sort of interpolation.
         UpperMap {
             elevation: land_map,
