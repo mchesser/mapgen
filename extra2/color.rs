@@ -1,5 +1,6 @@
 #[allow(dead_code)];
 
+/// An RGB color
 pub struct Rgb {
     r: u8,
     g: u8,
@@ -11,6 +12,7 @@ pub struct Rgb {
 /// Color list
 ///
 
+/// Colors from http://en.wikipedia.org/wiki/Lists_of_colors
 pub static AMBER:       Rgb = Rgb { r: 0xFF, g: 0x7F, b: 0x00 };
 pub static APPLE_GREEN: Rgb = Rgb { r: 0x8D, g: 0xB6, b: 0x00 };
 pub static AZURE:       Rgb = Rgb { r: 0x00, g: 0x7F, b: 0xFF };
@@ -40,6 +42,11 @@ pub static YELLOW:      Rgb = Rgb { r: 0xFF, g: 0xFF, b: 0x00 };
 ///
 
 /// Apply linear interpolation over a color map
+/// # Arguments
+/// `colors` - A vector of colors to choose from
+/// `x` - a value between 0.0 and 1.0 to select the color from
+/// # Return
+/// Returns the color after linear interpolation 
 pub fn linear_gradient(colors: &[Rgb], x: f64) -> Rgb {
     assert!(x >= 0.0 && x <= 1.0);
     

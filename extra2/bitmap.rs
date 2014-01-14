@@ -14,6 +14,10 @@ pub struct Bitmap {
 
 impl Bitmap {
     /// Set a pixel at x,y to a specified color
+    /// # Arugments
+    /// `x` - x coordinate
+    /// `y` - y coordinate
+    /// `color` - the color to set
     pub fn set_pixel(&mut self, x: uint, y: uint, color: Rgb) {
         // Calculate the byte offset for x
         let i = (self.height - y - 1) * (self.width * 3) + x * 3;
@@ -25,6 +29,8 @@ impl Bitmap {
     }
     
     /// Write the stored data to a file with given filename
+    /// # Arguments
+    /// `filename` - the file name to save the file to
     pub fn write_to_file(&self, filename: &str) {
         static FILE_HEADER_SIZE:  u32 = 14;
         static BMP_INFO_SIZE:     u32 = 40;
@@ -68,6 +74,11 @@ impl Bitmap {
     }
     
     /// Create a new bitmap
+    /// # Arguments
+    /// `width` - the width of the bitmap
+    /// `height` - the height of the bitmap
+    /// # Return
+    /// A new bitmap filled with black
     pub fn new(width: uint, height: uint) -> Bitmap {
         Bitmap {
             width:  width,
