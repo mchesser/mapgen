@@ -3,6 +3,8 @@ MapGen
 
 Basic map generation done using noise, and simulations
 
+![Screenshot](preview/flow.png)
+
 ### Currently working to
 * Fix ocean simulation
 * Remove lakes from ocean simulation
