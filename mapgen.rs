@@ -5,12 +5,11 @@ use extra2::shapes::{Circle, Rect};
 use std::util;
 use std::rand;
 use std::rand::Rng;
-//use std::num::sqrt;
 
 mod extra2;
 mod noise;
 
-
+// !!! FIXME: Use proper constants from Rust after numbers library is more stable
 static TAU: f32 = 2.0*3.14159265358979323;
 
 pub struct UpperMap {
@@ -20,6 +19,8 @@ pub struct UpperMap {
 
 impl UpperMap {
     pub fn new(width: uint, height: uint) -> UpperMap {     
+        
+        // !!! FIXME: Probably want to have more than one main island
         let islands = ~[ 
             Circle { 
                 center: Vec2::new((width/2) as f32, (height/2) as f32),
@@ -50,6 +51,7 @@ impl UpperMap {
         let tmp_map = noise::random_noise(width/4, height/4, width/8, 0);
         
         println!("Creating ocean flow base");
+        // !!! FIXME: Lakes should not be included in ocean flow
         let mut ocean_flow = array2d::from_fn(width/4, height/4, |x, y| {
             if land_map.get(x, y) < 0.0 {
                 Vec2::from_polar(tmp_map.get(x, y) * TAU / 4.0, 1.0)
@@ -59,9 +61,16 @@ impl UpperMap {
             }
         });
          
-        print!("Simulating ocean flow:");
+        println!("Simulating ocean flow:");
         simulate_ocean_flow(&land_map, &mut ocean_flow);
         
+        
+        // TODO:
+        // - Add weather simulation
+        // - A
+        
+        // !!! FIXME: Maps are lower resolution than input amount, they should be upscaled using
+        // some sort of interpolation.
         UpperMap {
             elevation: land_map,
             ocean_flow: ocean_flow
@@ -69,7 +78,7 @@ impl UpperMap {
     }
 }
 
-
+/// Creates base islands for the map
 fn create_islands(map: &mut Array2D<f32>, islands: ~[Circle]) {
     static SEA_LEVEL: f32 = 0.32;
     
@@ -80,6 +89,7 @@ fn create_islands(map: &mut Array2D<f32>, islands: ~[Circle]) {
             // Get the elevation factor of the island that affects the point the most
             let h = islands.iter().map(|v| radial_fade(*v, pos)).max_by(|&x| x).unwrap();           
             
+            // Split into land and sea
             if map.get(x, y) * h < SEA_LEVEL {
                 // Water
                 let value = -map.get(x, y);
@@ -93,6 +103,7 @@ fn create_islands(map: &mut Array2D<f32>, islands: ~[Circle]) {
     }
 }
 
+/// Randomises the elevation in the islands
 fn randomize_elevation(map: &mut Array2D<f32>) {
     let rand_map = noise::random_noise(map.width(), map.height(), map.width() / 8, 0);
     
@@ -103,7 +114,9 @@ fn randomize_elevation(map: &mut Array2D<f32>) {
     }
 }
 
+/// Simulates ocean flow, based on initial flow data and land data
 fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f32>>) {  
+    // A list of the possible adjacent tiles
     static ADJ: [(int, int),..9] = 
             [(-1, -1), ( 0, -1), ( 1, -1),
              (-1,  0), ( 0,  0), ( 1,  0), 
@@ -112,9 +125,10 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
     let source_flow = flow_data.clone();
     let mut rng = rand::weak_rng();
     
-    for i in range(0, 50) {
-        println!("{}", i);
-        
+    // Simulate for 25 steps
+    for _ in range(0, 25) {
+        // !!! FIXME: This is not very realistic, and limits how much the flow data can change as a
+        // result of other factors.
         let mut old = array2d::from_fn(flow_data.width(), flow_data.height(), 
                 |x, y| source_flow.get(x, y).scale(0.1));
         
@@ -122,7 +136,7 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
         
         for x in range(0, old.width()) {
             for y in range(0, old.height()) {
-                // No moving water
+                // No water on this square
                 if old.get(x, y).length_sqr() == 0.0 {
                     continue;
                 }
@@ -133,6 +147,7 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
                     let offset = Vec2::new(x as f32, y as f32) + direction;
                     let water_rect = Rect { x: offset.x, y: offset.y, width: 1.0, height: 1.0 };
                 
+                    // !!! FIXME: Could be made much more efficient
                     for &(dx, dy) in ADJ.iter() {
                         let nx = (x as int + dx);
                         let ny = (y as int + dy);
@@ -146,8 +161,9 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
                 }
                 // Moving water on land
                 else {
-                    // Water is on land, determine which way the sea is to push it back out that
-                    // way.
+                    // Water is on land, determine which way the sea is to push it back out that way
+                    
+                    // # NOTE: Doesn't seem very efficient... 
                     let ocean_tiles: ~[&(int, int)] = ADJ.iter().filter(|& &(dx, dy)| {
                         let nx = (x as int + dx);
                         let ny = (y as int + dy);
@@ -155,11 +171,13 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
                         array2d::wrap_get(land_data, nx, ny) < 0.0
                     }).collect();
                     
+                    // !!! FIXME: This should be handled correctly
                     if ocean_tiles.len() == 0 {
                         println!("Trapped Water");
                         continue;
                     }
                     
+                    // !!! FIXME: This doesn't look so great, and doesn't affect some things enough
                     let factor = 0.5 / ocean_tiles.len() as f32;
                     for & &(dx, dy) in ocean_tiles.iter() {
                         let nx = (x as int + dx);
@@ -171,18 +189,17 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
                         array2d::wrap_set(flow_data, nx, ny, prev + flow);
                     }
                     
-                    // Now the water has moved:
+                    // Remove the water from this tile now
                     flow_data.set(x, y, Vec2::zero());
                 }
             }
         }
         
+        // !!! FIXME: This doesn't seem very realistic
         for val in flow_data.mut_iter() {
             *val = val.scale(0.9);
         }
     }
-    
-    println!("{:?}", flow_data.iter().max_by(|v| v.length()));      
 }
 
 

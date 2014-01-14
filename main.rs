@@ -7,13 +7,18 @@ mod noise;
 mod mapgen;
 
 fn main() {
-    static SIZE: uint = 256*4;
+    static SIZE: uint = 256*8;
         
     let test = mapgen::UpperMap::new(SIZE, SIZE);
+    
+    println!("Saving elevation map");
     elevation_bitmap(&test, "elevation.bmp");
+    
+    println!("Saving flow map");
     flow_bitmap(&test, "flow.bmp");
 }
 
+/// Produce an elevation bitmap
 fn elevation_bitmap(map: &mapgen::UpperMap, filename: &str) {
     let mut bitmap = Bitmap::new(map.elevation.width(), map.elevation.height());
     
@@ -35,6 +40,7 @@ fn elevation_bitmap(map: &mapgen::UpperMap, filename: &str) {
     bitmap.write_to_file(filename);
 }
 
+/// Produce a flow bitmap
 fn flow_bitmap(map: &mapgen::UpperMap, filename: &str) {
     let mut len_map = array2d::from_fn(map.ocean_flow.width(), map.ocean_flow.height(),
             |x, y| map.ocean_flow.get(x, y).length());
@@ -42,7 +48,6 @@ fn flow_bitmap(map: &mapgen::UpperMap, filename: &str) {
     array2d::normalise(&mut len_map);
     
     let mut bitmap = Bitmap::new(map.ocean_flow.width(), map.ocean_flow.height());
-    
     
     let land_colors = [color::BEAVER, color::BUFF];
     let sea_colors = [color::BLACK, color::WHITE];
