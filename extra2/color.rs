@@ -1,9 +1,9 @@
 #[allow(dead_code)];
 
 pub struct Rgb {
-	r: u8,
-	g: u8,
-	b: u8
+    r: u8,
+    g: u8,
+    b: u8
 }
 
 
@@ -41,16 +41,18 @@ pub static YELLOW:      Rgb = Rgb { r: 0xFF, g: 0xFF, b: 0x00 };
 
 /// Apply linear interpolation over a color map
 pub fn linear_gradient(colors: &[Rgb], x: f64) -> Rgb {
-	let band_width = (colors.len() - 1) as f64;
+    assert!(x >= 0.0 && x <= 1.0);
+    
+    let band_width = (colors.len() - 1) as f64;
 
-	let c1 = (x * band_width) as uint;
-	let c2 = if x >= 1.0 { c1 } else { c1 + 1.0 };
-	
-	let x_new = 1.0 - (x * band_width - (c1 as f64));
-		
-	Rgb { 
-		r: (x_new * (colors[c1].r as f64) + (1.0 - x_new) * (colors[c2].r as f64)) as u8, 
-		g: (x_new * (colors[c1].g as f64) + (1.0 - x_new) * (colors[c2].g as f64)) as u8,
-		b: (x_new * (colors[c1].b as f64) + (1.0 - x_new) * (colors[c2].b as f64)) as u8
-	}
+    let c1 = (x * band_width) as uint;
+    let c2 = if x >= 1.0 { c1 } else { c1 + 1 };
+    
+    let x_new = 1.0 - (x * band_width - (c1 as f64));
+        
+    Rgb { 
+        r: (x_new * (colors[c1].r as f64) + (1.0 - x_new) * (colors[c2].r as f64)) as u8, 
+        g: (x_new * (colors[c1].g as f64) + (1.0 - x_new) * (colors[c2].g as f64)) as u8,
+        b: (x_new * (colors[c1].b as f64) + (1.0 - x_new) * (colors[c2].b as f64)) as u8
+    }
 }
