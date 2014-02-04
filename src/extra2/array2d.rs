@@ -9,7 +9,7 @@ pub struct Array2D<T> {
     priv data: ~[T]
 }
 
-impl<T: Clone> Array2D<T> { 
+impl<T: Clone> Array2D<T> {
     #[inline]
     /// Get the height of the array
     /// # Return
@@ -17,7 +17,7 @@ impl<T: Clone> Array2D<T> {
     pub fn height(&self) -> uint {
         self.height_
     }
-    
+
     #[inline]
     /// Get the width of the array
     /// # Return
@@ -25,9 +25,9 @@ impl<T: Clone> Array2D<T> {
     pub fn width(&self) -> uint {
         self.width_
     }
-    
-    
-    
+
+
+
     // TODO: Fix to use Index trait
     #[inline]
     /// Get an element in the array
@@ -37,7 +37,7 @@ impl<T: Clone> Array2D<T> {
     /// # Return
     /// The value at (x, y)
     pub fn get(&self, x: uint, y: uint) -> T {
-        if x > self.width() || y > self.height() { 
+        if x > self.width() || y > self.height() {
             fail!(
                 format!("Index out of bounds, x: {}, y: {}, width: {} height: {}",
                     x,
@@ -46,10 +46,10 @@ impl<T: Clone> Array2D<T> {
                     self.height())
             );
         }
-        
+
         self.data[(x + y * self.width()) as int].clone()
     }
-    
+
     #[inline]
     /// Set an element in the array
     /// # Arguments
@@ -57,7 +57,7 @@ impl<T: Clone> Array2D<T> {
     /// `y` - the y coordinate
     /// `value` - the value to set
     pub fn set(&mut self, x: uint, y: uint, value: T) {
-        if x > self.width() || y > self.height() { 
+        if x > self.width() || y > self.height() {
             fail!(
                 format!("Index out of bounds, x: {}, y: {}, width: {} height: {}",
                     x,
@@ -66,17 +66,17 @@ impl<T: Clone> Array2D<T> {
                     self.height())
             );
         }
-        
+
         self.data[(x + y * self.width()) as int] = value;
     }
-    
+
     /// Creates an iterator
     /// # Return
     /// Returns an iterator over the elements in the array left-right, up-down
     pub fn iter<'r>(&'r self) -> vec::VecIterator<'r, T> {
         self.data.iter()
     }
-    
+
     /// Creates an mutable iterator
     /// # Return
     /// Returns an mutable iterator over the elements in the array left-right, up-down
@@ -102,7 +102,7 @@ impl<T: Clone> Clone for Array2D<T> {
 /// `op` - The function to use
 /// # Return
 /// Returns the array initialised using the function
-pub fn from_fn<T>(width: uint, height: uint, op: |uint, uint| -> T) -> Array2D<T> { 
+pub fn from_fn<T>(width: uint, height: uint, op: |uint, uint| -> T) -> Array2D<T> {
     Array2D {
         width_: width,
         height_: height,
@@ -125,8 +125,8 @@ pub fn from_elem<T:Clone>(width: uint, height: uint, elem: T) -> Array2D<T> {
     }
 }
 
-/// Creates a new array from a raw vector. 
-///  - Fails if the raw vector has the wrong length. 
+/// Creates a new array from a raw vector.
+///  - Fails if the raw vector has the wrong length.
 ///  - Raw vector is moved
 /// # Arguments
 /// `width` - The width of the array
@@ -138,12 +138,12 @@ pub fn from_raw<T>(width: uint, height: uint, raw: ~[T]) -> Array2D<T> {
     if width * height != raw.len() {
         fail!("Raw array of invalid length");
     }
-    
+
     Array2D {
         width_: width,
         height_: height,
         data: raw
-    }   
+    }
 }
 
 ///
@@ -156,7 +156,7 @@ pub fn from_raw<T>(width: uint, height: uint, raw: ~[T]) -> Array2D<T> {
 pub fn normalise(target: &mut Array2D<f32>) {
     let mut min = target.get(0, 0);
     let mut max = target.get(0, 0);
-    
+
     for &val in target.iter() {
         if min > val {
             min = val;
@@ -164,7 +164,7 @@ pub fn normalise(target: &mut Array2D<f32>) {
             max = val;
         }
     }
-    
+
     let factor = 1.0 / (max - min);
     for val in target.mut_iter() {
         *val = (*val - min) * factor;
@@ -179,14 +179,14 @@ pub fn normalise(target: &mut Array2D<f32>) {
 /// # Return
 /// The element found after wrapping x and y
 pub fn wrap_get<T: Clone>(target: &Array2D<T>, x: int, y: int) -> T {
-    let x = 
+    let x =
         if x < 0 { (target.width() as int + x % target.width() as int) as uint }
         else { x as uint % target.width() };
-    
+
     let y =
         if y < 0 { (target.height() as int + y % target.height() as int) as uint }
         else { y as uint % target.height() };
-    
+
     target.get(x, y)
 }
 
@@ -195,12 +195,12 @@ pub fn wrap_get<T: Clone>(target: &Array2D<T>, x: int, y: int) -> T {
 /// `target` - the array
 /// `x` - the x coordinate
 /// `y` - the y coordinate
-/// `value` - The value to set 
+/// `value` - The value to set
 pub fn wrap_set<T: Clone>(target: &mut Array2D<T>, x: int, y: int, value: T) {
-    let x = 
+    let x =
         if x < 0 { (target.width() as int + x % target.width() as int) as uint }
         else { x as uint % target.width() };
-    
+
     let y =
         if y < 0 { (target.height() as int + y % target.height() as int) as uint }
         else { y as uint % target.height() };

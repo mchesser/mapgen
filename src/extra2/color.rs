@@ -1,10 +1,23 @@
 #[allow(dead_code)];
 
+use extra2::interpolate::Interpolate;
+
 /// An RGB color
+#[deriving(Clone)]
 pub struct Rgb {
     r: u8,
     g: u8,
     b: u8
+}
+
+impl Interpolate for Rgb {
+    fn lerp(v: [Rgb, ..2], x: f64) -> Rgb {
+        Rgb {
+            r: Interpolate::lerp([v[0].r, v[1].r], x),
+            g: Interpolate::lerp([v[0].g, v[1].g], x),
+            b: Interpolate::lerp([v[0].b, v[1].b], x)
+        }
+    }
 }
 
 
@@ -46,20 +59,22 @@ pub static YELLOW:      Rgb = Rgb { r: 0xFF, g: 0xFF, b: 0x00 };
 /// `colors` - A vector of colors to choose from
 /// `x` - a value between 0.0 and 1.0 to select the color from
 /// # Return
-/// Returns the color after linear interpolation 
+/// Returns the color after linear interpolation
 pub fn linear_gradient(colors: &[Rgb], x: f64) -> Rgb {
     assert!(x >= 0.0 && x <= 1.0);
-    
-    let band_width = (colors.len() - 1) as f64;
 
-    let c1 = (x * band_width) as uint;
-    let c2 = if x >= 1.0 { c1 } else { c1 + 1 };
-    
-    let x_new = 1.0 - (x * band_width - (c1 as f64));
-        
-    Rgb { 
-        r: (x_new * (colors[c1].r as f64) + (1.0 - x_new) * (colors[c2].r as f64)) as u8, 
-        g: (x_new * (colors[c1].g as f64) + (1.0 - x_new) * (colors[c2].g as f64)) as u8,
-        b: (x_new * (colors[c1].b as f64) + (1.0 - x_new) * (colors[c2].b as f64)) as u8
+    // !!! FIXME: Invalid in the latest Rust
+    // !!! SOLUTION: Match on the return value of .head() and .last()
+    if x == 0.0 {
+        return *colors.head();
     }
+    else if x == 1.0 {
+        return *colors.last();
+    }
+
+    let band_width = (colors.len() - 1) as f64;
+    let c1 = (x * band_width) as uint;
+    let c2 = c1 + 1;
+    let x_new = 1.0 - (x * band_width - (c1 as f64));
+    Interpolate::lerp([colors[c2], colors[c1]], x_new)
 }

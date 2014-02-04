@@ -2,11 +2,11 @@ use extra2::array2d;
 use extra2::array2d::Array2D;
 use extra2::vectors::Vec2;
 use extra2::shapes::{Circle, Rect};
+use extra2::interpolate::Interpolate;
 use std::util;
 use std::rand;
 use std::rand::Rng;
 
-mod extra2;
 mod noise;
 
 // !!! FIXME: Use proper constants from Rust after numbers library is more stable
@@ -66,8 +66,8 @@ impl UpperMap {
         // !!! FIXME: Maps are lower resolution than input amount
         // !!! SOLUTION: Up-scale using some sort of interpolation.
         UpperMap {
-            elevation: land_map,
-            ocean_flow: ocean_flow
+            elevation: elevation,
+            ocean_flow: upscale(&ocean_flow, 4)
         }
     }
 }
@@ -236,4 +236,20 @@ fn flood_fill_if_less<A: Clone + Eq, B: Clone + Ord>(target: &mut Array2D<A>, ch
             if x+1 < check.width() { active.push((x+1, y)); }
         }
     }
+}
+
+fn upscale<T: Interpolate>(input: &Array2D<T>, scale: uint) -> Array2D<T> {
+    array2d::from_fn(input.width()*scale, input.height()*scale, |x, y| {
+        let in_x = (x/scale) as int;
+        let in_y = (y/scale) as int;
+
+        let values = [
+            [array2d::wrap_get(input, in_x, in_y), array2d::wrap_get(input, in_x, in_y+1)],
+            [array2d::wrap_get(input, in_x+1, in_y), array2d::wrap_get(input, in_x+1, in_y+1)],
+        ];
+
+        let dx = ((x % scale) as f64) / (scale as f64);
+        let dy = ((y % scale) as f64) / (scale as f64);
+        Interpolate::bilerp(values, dx, dy)
+    })
 }

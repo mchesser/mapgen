@@ -21,13 +21,13 @@ impl Bitmap {
     pub fn set_pixel(&mut self, x: uint, y: uint, color: Rgb) {
         // Calculate the byte offset for x
         let i = (self.height - y - 1) * (self.width * 3) + x * 3;
-        
+
         // Note: Pixel order is (blue, green, red)
         self.pixels[i + 0] = color.b;
         self.pixels[i + 1] = color.g;
         self.pixels[i + 2] = color.r;
     }
-    
+
     /// Write the stored data to a file with given filename
     /// # Arguments
     /// `filename` - the file name to save the file to
@@ -35,10 +35,10 @@ impl Bitmap {
         static FILE_HEADER_SIZE:  u32 = 14;
         static BMP_INFO_SIZE:     u32 = 40;
         static TOTAL_HEADER_SIZE: u32 = FILE_HEADER_SIZE + BMP_INFO_SIZE;
-        
+
         let image_size = (self.height * self.width*3 + self.height * (self.width % 4)) as u32;
         let file_size = image_size + TOTAL_HEADER_SIZE;
-        
+
         // Bitmap file header
         let file_header: [u8, ..FILE_HEADER_SIZE] = [
             'B' as u8, 'M' as u8,
@@ -61,18 +61,18 @@ impl Bitmap {
             0, 0, 0, 0,
             0, 0, 0, 0
         ];
-        
+
         // Set up the file writer
         let mut file = io::File::create(&Path::new(filename));
-        
+
         // Write the bitmap headers to file
         file.write(file_header);
         file.write(info_header);
-        
+
         // Write data to file
         file.write(self.pixels);
     }
-    
+
     /// Create a new bitmap
     /// # Arguments
     /// `width` - the width of the bitmap

@@ -37,65 +37,65 @@ pub fn random_noise(width: uint, height: uint, feature_size: uint, min_res: uint
 
         (top_left + top_right + bottom_left + bottom_right) / 4.0
     }
-    
-    
+
+
     //
     // Main algorithm
     //
-    
+
     let mut target = array2d::from_elem(width, height, 0.0_f32);
     let mut rng = rand::weak_rng();
-    
+
     // Set the initial sample points
     for x in range_step(0, target.width(), feature_size) {
         for y in range_step(0, target.height(), feature_size) {
             target.set(x, y, rng.gen::<f32>());
         }
-    }   
-    
+    }
+
     let mut step_size = feature_size / 2u;
     let mut factor = 1.0;
-    
+
     // Apply the diamond square algorithm
     while step_size > 1 {
         let half_size = step_size / 2u;
-        
+
         // Diamond
         for x in range_step(half_size, target.width() + step_size, step_size) {
             for y in range_step(half_size, target.height() + step_size, step_size) {
                 let noise = (rng.gen::<f32>() * 2.0 - 1.0) * factor;
                 let value = average_corner(&target, x, y, half_size) + noise;
-                
+
                 array2d::wrap_set(&mut target, x as int, y as int, value);
             }
         }
-        
+
         // Square
         for x in range_step(0, target.width(), step_size) {
             for y in range_step(0, target.height(), step_size) {
                 let noise = (rng.gen::<f32>() * 2.0 - 1.0) * factor;
                 let value = average_side(&target, x + half_size, y, half_size) + noise;
-            
+
                 array2d::wrap_set(&mut target, x as int + half_size as int, y as int, value);
-                
+
                 let noise = (rng.gen::<f32>() * 2.0 - 1.0) * factor;
                 let value = average_side(&target, x, y + half_size, half_size) + noise;
-                
+
                 array2d::wrap_set(&mut target, x as int, y as int + half_size as int, value);
             }
         }
-        
+
         step_size /= 2;
-        
-        factor = 
-            if step_size >= min_res { 
+
+        factor =
+            if step_size >= min_res {
                 factor / 2.0
             }
             else {
                 0.0
             };
     }
-    
+
     array2d::normalise(&mut target);
     target
 }

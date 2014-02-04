@@ -2,12 +2,13 @@
 
 use std::fmt;
 use std::num::{zero, one, sqrt, sin_cos, atan2};
+use extra2::interpolate::Interpolate;
 
 /// A 2-dimensional vector.
 #[deriving(Eq, Clone, Zero)]
-pub struct Vec2<T> { 
+pub struct Vec2<T> {
     x: T,
-    y: T 
+    y: T
 }
 
 impl<T> Vec2<T> {
@@ -29,21 +30,21 @@ impl<T: Primitive + Clone> Vec2<T> {
     pub fn zero() -> Vec2<T> {
         Vec2 { x: zero(), y: zero() }
     }
-    
+
     /// Create the unit vector in the x direction
     /// # Return
     /// The new vector
     pub fn unit_x() -> Vec2<T> {
         Vec2 { x: one(), y: zero() }
     }
-    
+
     /// Create the unit vector in the y direction
     /// # Return
     /// The new vector
     pub fn unit_y() -> Vec2<T> {
         Vec2 { x: zero(), y: one() }
     }
-    
+
     /// Calculate the dot product between this and another vector
     /// # Arugments
     /// `other` - the other vector
@@ -80,28 +81,28 @@ impl<T: Float> Vec2<T> {
         let (sin_a, cos_a) = sin_cos(angle);
         Vec2::new(mag * cos_a, mag * sin_a)
     }
-    
+
     /// Calculates the length squared of the vector. Avoids taking a square root.
     /// # Return
     /// The length of the vector squared
     pub fn length_sqr(&self) -> T {
         self.dot(self)
     }
-    
+
     /// Calculates the lenght of the vector
     /// # Return
     /// The length of the vector
     pub fn length(&self) -> T {
         sqrt(self.length_sqr())
     }
-    
+
     /// Normalises the vector
     pub fn normalize(&mut self) {
         let len = self.length();
         self.x = self.x / len;
         self.y = self.y / len;
-    } 
-    
+    }
+
     /// Creates a unit vector in the direction of the vector
     /// # Return
     /// The unit vector
@@ -109,7 +110,7 @@ impl<T: Float> Vec2<T> {
         let len = self.length();
         Vec2::new(self.x / len, self.y / len)
     }
-    
+
     /// Rotates a vector by a specified angle
     /// # Arguments
     /// `angle` - the angle to rotate by
@@ -119,7 +120,7 @@ impl<T: Float> Vec2<T> {
         self.x = old_x*cos_a - old_y*sin_a;
         self.y = old_x*sin_a + old_y*cos_a;
     }
-    
+
     /// Gets the angle of the vector
     /// # Return
     /// The angle of the vector
@@ -136,7 +137,7 @@ impl<T: Mul<T, T>> Vec2<T> {
     /// A new vector
     pub fn scale(&self, scalar: T) -> Vec2<T> {
         Vec2::new(self.x * scalar, self.y * scalar)
-    }   
+    }
 }
 
 impl<T: fmt::Default> ToStr for Vec2<T> {
@@ -145,5 +146,15 @@ impl<T: fmt::Default> ToStr for Vec2<T> {
     /// A string representing a vector
     fn to_str(&self) -> ~str {
         format!("[{}, {}]", self.x, self.y)
+    }
+}
+
+/// !!! FIXME: Make generic
+impl Interpolate for Vec2<f32> {
+    fn lerp(v: [Vec2<f32>, ..2], x: f64) -> Vec2<f32> {
+        Vec2 {
+            x: Interpolate::lerp([v[0].x, v[1].x], x),
+            y: Interpolate::lerp([v[0].y, v[1].y], x)
+        }
     }
 }
