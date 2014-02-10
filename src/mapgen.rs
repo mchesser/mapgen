@@ -62,7 +62,6 @@ impl UpperMap {
         println!("Simulating ocean flow");
         simulate_ocean_flow(&land_map, &mut ocean_flow);
 
-
         // !!! FIXME: Maps are lower resolution than input amount
         // !!! SOLUTION: Up-scale using some sort of interpolation.
         UpperMap {
@@ -220,9 +219,7 @@ fn flood_fill_if_less<A: Clone + Eq, B: Clone + Ord>(target: &mut Array2D<A>, ch
 
     let mut active = box [(x, y)];
     loop {
-        // !!! FIXME: Incorrect in latest Rust
-        // !!! SOLUTION: Change to active.pop()
-        let (x, y) = match active.pop_opt() {
+        let (x, y) = match active.pop() {
             Some(v) => v,
             None => break
         };

@@ -62,14 +62,19 @@ pub static YELLOW:      Rgb = Rgb { r: 0xFF, g: 0xFF, b: 0x00 };
 /// Returns the color after linear interpolation
 pub fn linear_gradient(colors: &[Rgb], x: f64) -> Rgb {
     assert!(x >= 0.0 && x <= 1.0);
+    assert!(colors.len() >= 2);
 
-    // !!! FIXME: Invalid in the latest Rust
-    // !!! SOLUTION: Match on the return value of .head() and .last()
     if x == 0.0 {
-        return *colors.head();
+        match colors.head() {
+            Some(color) => return *color,
+            None => unreachable!()
+        }
     }
     else if x == 1.0 {
-        return *colors.last();
+        match colors.last() {
+            Some(color) => return *color,
+            None => unreachable!()
+        }
     }
 
     let band_width = (colors.len() - 1) as f64;

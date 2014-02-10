@@ -36,7 +36,10 @@ fn elevation_bitmap(map: &mapgen::UpperMap, filename: &str) {
         }
     }
 
-    bitmap.write_to_file(filename);
+    match bitmap.write_to_file(filename) {
+        Ok(_) => {},
+        Err(err) => fail!("Failed to write elevation bitmap to file: {:?}", err)
+    }
 }
 
 /// Produce a flow bitmap
@@ -63,5 +66,8 @@ fn flow_bitmap(map: &mapgen::UpperMap, filename: &str) {
         }
     }
 
-    bitmap.write_to_file(filename);
+    match bitmap.write_to_file(filename) {
+        Ok(_) => {},
+        Err(err) => fail!("Failed to write flow bitmap to file: {:?}", err)
+    }
 }

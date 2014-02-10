@@ -73,14 +73,14 @@ impl<T: Clone> Array2D<T> {
     /// Creates an iterator
     /// # Return
     /// Returns an iterator over the elements in the array left-right, up-down
-    pub fn iter<'r>(&'r self) -> vec::VecIterator<'r, T> {
+    pub fn iter<'r>(&'r self) -> vec::Items<'r, T> {
         self.data.iter()
     }
 
     /// Creates an mutable iterator
     /// # Return
     /// Returns an mutable iterator over the elements in the array left-right, up-down
-    pub fn mut_iter<'r>(&'r mut self) -> vec::VecMutIterator<'r, T> {
+    pub fn mut_iter<'r>(&'r mut self) -> vec::MutItems<'r, T> {
         self.data.mut_iter()
     }
 }

@@ -31,7 +31,7 @@ impl Bitmap {
     /// Write the stored data to a file with given filename
     /// # Arguments
     /// `filename` - the file name to save the file to
-    pub fn write_to_file(&self, filename: &str) {
+    pub fn write_to_file(&self, filename: &str) -> io::IoResult<()> {
         static FILE_HEADER_SIZE:  u32 = 14;
         static BMP_INFO_SIZE:     u32 = 40;
         static TOTAL_HEADER_SIZE: u32 = FILE_HEADER_SIZE + BMP_INFO_SIZE;
@@ -66,11 +66,11 @@ impl Bitmap {
         let mut file = io::File::create(&Path::new(filename));
 
         // Write the bitmap headers to file
-        file.write(file_header);
-        file.write(info_header);
+        if_ok!(file.write(file_header));
+        if_ok!(file.write(info_header));
 
         // Write data to file
-        file.write(self.pixels);
+        file.write(self.pixels)
     }
 
     /// Create a new bitmap

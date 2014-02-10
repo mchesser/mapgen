@@ -5,7 +5,7 @@ use std::num::{zero, one, sqrt, sin_cos, atan2};
 use extra2::interpolate::Interpolate;
 
 /// A 2-dimensional vector.
-#[deriving(Eq, Clone, Zero)]
+#[deriving(Eq, Clone)]
 pub struct Vec2<T> {
     x: T,
     y: T
@@ -140,7 +140,7 @@ impl<T: Mul<T, T>> Vec2<T> {
     }
 }
 
-impl<T: fmt::Default> ToStr for Vec2<T> {
+impl<T: fmt::Show> ToStr for Vec2<T> {
     /// Provides a string representation of the vector
     /// # Return
     /// A string representing a vector
