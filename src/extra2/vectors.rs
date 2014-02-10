@@ -149,12 +149,18 @@ impl<T: fmt::Default> ToStr for Vec2<T> {
     }
 }
 
-/// !!! FIXME: Make generic
-impl Interpolate for Vec2<f32> {
-    fn lerp(v: [Vec2<f32>, ..2], x: f64) -> Vec2<f32> {
+impl<T: Interpolate> Interpolate for Vec2<T> {
+    /// Linearly interpolates between two vectors
+    /// # Arguments
+    /// `v` - The two vectors to interpolate
+    /// `x` - The interpolation factor
+    /// # Returns
+    /// A vector between v[0] and v[1]
+    #[inline]
+    fn lerp(v: [Vec2<T>, ..2], x: f64) -> Vec2<T> {
         Vec2 {
-            x: Interpolate::lerp([v[0].x, v[1].x], x),
-            y: Interpolate::lerp([v[0].y, v[1].y], x)
+            x: Interpolate::lerp([v[0].x.clone(), v[1].x.clone()], x),
+            y: Interpolate::lerp([v[0].y.clone(), v[1].y.clone()], x)
         }
     }
 }
