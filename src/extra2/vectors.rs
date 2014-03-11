@@ -140,12 +140,12 @@ impl<T: Mul<T, T>> Vec2<T> {
     }
 }
 
-impl<T: fmt::Show> ToStr for Vec2<T> {
+impl<T: fmt::Show> fmt::Show for Vec2<T> {
     /// Provides a string representation of the vector
     /// # Return
     /// A string representing a vector
-    fn to_str(&self) -> ~str {
-        format!("[{}, {}]", self.x, self.y)
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f.buf, "[{}, {}]", self.x, self.y)
     }
 }
 

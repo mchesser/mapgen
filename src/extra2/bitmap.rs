@@ -66,8 +66,8 @@ impl Bitmap {
         let mut file = io::File::create(&Path::new(filename));
 
         // Write the bitmap headers to file
-        if_ok!(file.write(file_header));
-        if_ok!(file.write(info_header));
+        try!(file.write(file_header));
+        try!(file.write(info_header));
 
         // Write data to file
         file.write(self.pixels)

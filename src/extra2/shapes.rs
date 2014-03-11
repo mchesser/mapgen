@@ -1,7 +1,6 @@
 #[allow(dead_code)];
 
 use extra2::vectors::Vec2;
-use std::num::{min, max};
 
 /// Circle structure, with center and radius
 pub struct Circle {
@@ -95,8 +94,14 @@ impl Rect {
     /// # Return
     /// The intersection area
     pub fn intersect_area(&self, other: &Rect) -> f32 {
-        let x_intersect = min(self.right(), other.right()) - max(self.left(), other.left());
-        let y_intersect = min(self.bottom(), other.bottom()) - max(self.top(), other.top());
+        // !!! FIXME: Change to use fmin/fmax once they are working in Rust again
+        let x_intersect =
+            if self.right() < other.right() { self.right() } else { other.right() } -
+            if self.left() > other.left() { self.left() } else { other.left() };
+
+        let y_intersect =
+            if self.bottom() < other.bottom() { self.bottom() } else { other.bottom() } -
+            if self.top() > other.top() { self.top() } else { other.top() };
 
         if x_intersect < 0.0 || y_intersect < 0.0 {
             0.0

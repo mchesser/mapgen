@@ -3,9 +3,9 @@ use extra2::array2d::Array2D;
 use extra2::vectors::Vec2;
 use extra2::shapes::{Circle, Rect};
 use extra2::interpolate::Interpolate;
-use std::util;
 use std::rand;
 use std::rand::Rng;
+use std::mem;
 
 mod noise;
 
@@ -125,7 +125,7 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
         let mut old = array2d::from_fn(flow_data.width(), flow_data.height(),
                 |x, y| source_flow.get(x, y).scale(0.1));
 
-        util::swap(flow_data, &mut old);
+        mem::swap(flow_data, &mut old);
 
         for x in range(0, old.width()) {
             for y in range(0, old.height()) {
@@ -142,8 +142,8 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
 
                     // !!! FIXME: Could be made much more efficient
                     for &(dx, dy) in ADJ.iter() {
-                        let nx = (x as int + dx);
-                        let ny = (y as int + dy);
+                        let nx = x as int + dx;
+                        let ny = y as int + dy;
 
                         let grid_rect = Rect { x: nx as f32, y: ny as f32, width: 1.0, height: 1.0 };
                         let factor = water_rect.intersect_area(&grid_rect);
@@ -158,8 +158,8 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
 
                     // !!! FIXME: Doesn't seem very efficient...
                     let ocean_tiles: ~[&(int, int)] = ADJ.iter().filter(|& &(dx, dy)| {
-                        let nx = (x as int + dx);
-                        let ny = (y as int + dy);
+                        let nx = x as int + dx;
+                        let ny = y as int + dy;
 
                         array2d::wrap_get(land_data, nx, ny) < 0.0
                     }).collect();
@@ -173,8 +173,8 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
                     // !!! FIXME: This doesn't look so great, and doesn't affect some things enough
                     let factor = 0.5 / ocean_tiles.len() as f32;
                     for & &(dx, dy) in ocean_tiles.iter() {
-                        let nx = (x as int + dx);
-                        let ny = (y as int + dy);
+                        let nx = x as int + dx;
+                        let ny = y as int + dy;
                         let mut flow = Vec2::new(dx as f32, dy as f32).unit().scale(factor);
                         flow.rotate(TAU / 10.0 * (rng.gen::<f32>() * 2.0 - 1.0));
 
