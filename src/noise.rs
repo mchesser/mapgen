@@ -1,7 +1,6 @@
-#[allow(dead_code)];
+use rand;
+use rand::Rng;
 
-use std::rand;
-use std::rand::Rng;
 use std::iter::range_step;
 use extra2::array2d::Array2D;
 use extra2::array2d;

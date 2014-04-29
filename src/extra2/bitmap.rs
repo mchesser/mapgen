@@ -1,15 +1,12 @@
-#[allow(dead_code)];
-
+#![allow(dead_code)]
 use std::io;
-use std::vec;
 use extra2::color::Rgb;
-
 
 /// Main bitmap structure
 pub struct Bitmap {
-    width:  uint,
-    height: uint,
-    pixels: ~[u8]
+    pub width:  uint,
+    pub height: uint,
+    pixels: Vec<u8>,
 }
 
 impl Bitmap {
@@ -23,9 +20,9 @@ impl Bitmap {
         let i = (self.height - y - 1) * (self.width * 3) + x * 3;
 
         // Note: Pixel order is (blue, green, red)
-        self.pixels[i + 0] = color.b;
-        self.pixels[i + 1] = color.g;
-        self.pixels[i + 2] = color.r;
+        *self.pixels.get_mut(i + 0) = color.b;
+        *self.pixels.get_mut(i + 1) = color.g;
+        *self.pixels.get_mut(i + 2) = color.r;
     }
 
     /// Write the stored data to a file with given filename
@@ -70,7 +67,7 @@ impl Bitmap {
         try!(file.write(info_header));
 
         // Write data to file
-        file.write(self.pixels)
+        file.write(self.pixels.as_slice())
     }
 
     /// Create a new bitmap
@@ -83,7 +80,7 @@ impl Bitmap {
         Bitmap {
             width:  width,
             height: height,
-            pixels: vec::from_elem(height * (width * 3 + width % 4), 0u8)
+            pixels: Vec::from_elem(height * (width * 3 + width % 4), 0u8)
         }
     }
 }

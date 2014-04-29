@@ -1,19 +1,18 @@
-#[allow(dead_code)];
-
+#![allow(dead_code)]
 use extra2::vectors::Vec2;
 
 /// Circle structure, with center and radius
 pub struct Circle {
-    center: Vec2<f32>,
-    radius: f32,
+    pub center: Vec2<f32>,
+    pub radius: f32,
 }
 
 /// Rectangle structure
 pub struct Rect {
-    x: f32,
-    y: f32,
-    width: f32,
-    height: f32
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32
 }
 
 impl Rect {

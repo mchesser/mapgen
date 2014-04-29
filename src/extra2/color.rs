@@ -1,13 +1,13 @@
-#[allow(dead_code)];
+#![allow(dead_code)]
 
 use extra2::interpolate::Interpolate;
 
 /// An RGB color
 #[deriving(Clone)]
 pub struct Rgb {
-    r: u8,
-    g: u8,
-    b: u8
+    pub r: u8,
+    pub g: u8,
+    pub b: u8
 }
 
 impl Interpolate for Rgb {

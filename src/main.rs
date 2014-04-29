@@ -1,3 +1,5 @@
+extern crate rand;
+
 use extra2::bitmap::Bitmap;
 use extra2::color;
 use extra2::array2d;

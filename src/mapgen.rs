@@ -3,9 +3,11 @@ use extra2::array2d::Array2D;
 use extra2::vectors::Vec2;
 use extra2::shapes::{Circle, Rect};
 use extra2::interpolate::Interpolate;
-use std::rand;
-use std::rand::Rng;
+
 use std::mem;
+use std::num::Float;
+use rand;
+use rand::Rng;
 
 mod noise;
 
@@ -13,15 +15,15 @@ mod noise;
 static TAU: f32 = 2.0*3.14159265358979323;
 
 pub struct UpperMap {
-    elevation: Array2D<f32>,
-    ocean_flow: Array2D<Vec2<f32>>,
+    pub elevation: Array2D<f32>,
+    pub ocean_flow: Array2D<Vec2<f32>>,
 }
 
 impl UpperMap {
     pub fn new(width: uint, height: uint) -> UpperMap {
 
         // !!! FIXME: Probably want to have more than one main island
-        let islands = box [
+        let islands = vec![
             Circle {
                 center: Vec2::new((width/2) as f32, (height/2) as f32),
                 radius: width as f32 / 1.3
@@ -72,7 +74,7 @@ impl UpperMap {
 }
 
 /// Creates base islands for the map
-fn create_islands(map: &mut Array2D<f32>, islands: ~[Circle]) {
+fn create_islands(map: &mut Array2D<f32>, islands: Vec<Circle>) {
     static SEA_LEVEL: f32 = 0.32;
 
     for x in range(0, map.width()) {
@@ -80,7 +82,7 @@ fn create_islands(map: &mut Array2D<f32>, islands: ~[Circle]) {
             let pos = Vec2::new(x as f32, y as f32);
 
             // Get the elevation factor of the island that affects the point the most
-            let h = islands.iter().map(|v| radial_fade(*v, pos)).max_by(|&x| x).unwrap();
+            let h = islands.iter().map(|v| radial_fade(*v, pos)).fold(0.0f32, |a, b| a.max(b));
 
             // Split into land and sea
             if map.get(x, y) * h < SEA_LEVEL {
@@ -157,7 +159,7 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
                     // Water is on land, determine which way the sea is to push it back out that way
 
                     // !!! FIXME: Doesn't seem very efficient...
-                    let ocean_tiles: ~[&(int, int)] = ADJ.iter().filter(|& &(dx, dy)| {
+                    let ocean_tiles: Vec<&(int, int)> = ADJ.iter().filter(|& &(dx, dy)| {
                         let nx = x as int + dx;
                         let ny = y as int + dy;
 
@@ -217,7 +219,7 @@ fn flood_fill_if_less<A: Clone + Eq, B: Clone + Ord>(target: &mut Array2D<A>, ch
         return;
     }
 
-    let mut active = box [(x, y)];
+    let mut active = vec![(x, y)];
     loop {
         let (x, y) = match active.pop() {
             Some(v) => v,

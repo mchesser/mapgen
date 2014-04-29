@@ -1,12 +1,12 @@
-#[allow(dead_code)];
-
-use std::vec;
+#![allow(dead_code)]
+use std::vec::Vec;
+use std::slice;
 
 /// A structure for storing a 2D collection of elements
 pub struct Array2D<T> {
-    priv width_: uint,
-    priv height_: uint,
-    priv data: ~[T]
+    width_: uint,
+    height_: uint,
+    data: Vec<T>,
 }
 
 impl<T: Clone> Array2D<T> {
@@ -25,8 +25,6 @@ impl<T: Clone> Array2D<T> {
     pub fn width(&self) -> uint {
         self.width_
     }
-
-
 
     // TODO: Fix to use Index trait
     #[inline]
@@ -47,7 +45,7 @@ impl<T: Clone> Array2D<T> {
             );
         }
 
-        self.data[(x + y * self.width()) as int].clone()
+        self.data.get((x + y * self.width()) as uint).clone()
     }
 
     #[inline]
@@ -67,20 +65,21 @@ impl<T: Clone> Array2D<T> {
             );
         }
 
-        self.data[(x + y * self.width()) as int] = value;
+        let index = (x + y * self.width()) as uint;
+        *self.data.get_mut(index) = value;
     }
 
     /// Creates an iterator
     /// # Return
     /// Returns an iterator over the elements in the array left-right, up-down
-    pub fn iter<'r>(&'r self) -> vec::Items<'r, T> {
+    pub fn iter<'r>(&'r self) -> slice::Items<'r, T> {
         self.data.iter()
     }
 
     /// Creates an mutable iterator
     /// # Return
     /// Returns an mutable iterator over the elements in the array left-right, up-down
-    pub fn mut_iter<'r>(&'r mut self) -> vec::MutItems<'r, T> {
+    pub fn mut_iter<'r>(&'r mut self) -> slice::MutItems<'r, T> {
         self.data.mut_iter()
     }
 }
@@ -106,7 +105,7 @@ pub fn from_fn<T>(width: uint, height: uint, op: |uint, uint| -> T) -> Array2D<T
     Array2D {
         width_: width,
         height_: height,
-        data: vec::from_fn(width*height, |i| op(i % width, i / width)),
+        data: Vec::from_fn(width*height, |i| op(i % width, i / width)),
     }
 }
 
@@ -121,7 +120,7 @@ pub fn from_elem<T:Clone>(width: uint, height: uint, elem: T) -> Array2D<T> {
     Array2D {
         width_: width,
         height_: height,
-        data: vec::from_elem(width * height, elem.clone())
+        data: Vec::from_elem(width * height, elem.clone())
     }
 }
 
@@ -134,7 +133,7 @@ pub fn from_elem<T:Clone>(width: uint, height: uint, elem: T) -> Array2D<T> {
 /// `raw` - The raw vector
 /// # Return
 /// Returns the array initialised using the function
-pub fn from_raw<T>(width: uint, height: uint, raw: ~[T]) -> Array2D<T> {
+pub fn from_raw<T>(width: uint, height: uint, raw: Vec<T>) -> Array2D<T> {
     if width * height != raw.len() {
         fail!("Raw array of invalid length");
     }
