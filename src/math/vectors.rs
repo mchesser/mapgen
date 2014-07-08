@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 use std::fmt;
-use std::num::{zero, one, Float};
-use extra2::interpolate::Interpolate;
+use std::num::{zero, one, Float, FloatMath};
+use math::interpolate::Interpolate;
 
 /// A 2-dimensional vector.
-#[deriving(Eq, Clone)]
+#[deriving(PartialEq, Eq, Clone)]
 pub struct Vec2<T> {
     pub x: T,
     pub y: T
@@ -69,7 +69,7 @@ impl<T: Primitive + Clone> Sub<Vec2<T>, Vec2<T>> for Vec2<T> {
 }
 
 
-impl<T: Float> Vec2<T> {
+impl<T: Float + FloatMath> Vec2<T> {
     /// Create a new vector from polar coordinates
     /// # Arguments
     /// `angle` - the angle of the vector
@@ -144,7 +144,7 @@ impl<T: fmt::Show> fmt::Show for Vec2<T> {
     /// # Return
     /// A string representing a vector
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f.buf, "[{}, {}]", self.x, self.y)
+        write!(f, "[{}, {}]", self.x, self.y)
     }
 }
 

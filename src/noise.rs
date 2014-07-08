@@ -1,11 +1,9 @@
-use rand;
-use rand::Rng;
+use std::rand;
+use std::rand::Rng;
 
 use std::iter::range_step;
-use extra2::array2d::Array2D;
-use extra2::array2d;
-
-mod extra2;
+use array2d;
+use array2d::Array2D;
 
 /// Generate a random field based on the midpoint displacement algorithm
 /// # Arguments
@@ -48,7 +46,7 @@ pub fn random_noise(width: uint, height: uint, feature_size: uint, min_res: uint
     // Set the initial sample points
     for x in range_step(0, target.width(), feature_size) {
         for y in range_step(0, target.height(), feature_size) {
-            target.set(x, y, rng.gen::<f32>());
+            *target.get_mut(x, y) = rng.gen::<f32>();
         }
     }
 

@@ -1,3 +1,25 @@
+# Object files
+*.o
+*.ko
+
+# Libraries
+*.lib
+*.a
+*.rlib
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
 *.exe
-/tmp/
-*.bmp
+*.out
+*.app
+
+# Cargo
+target/
+
+# Temporary files
+tmp/

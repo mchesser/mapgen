@@ -1,15 +1,13 @@
-use extra2::array2d;
-use extra2::array2d::Array2D;
-use extra2::vectors::Vec2;
-use extra2::shapes::{Circle, Rect};
-use extra2::interpolate::Interpolate;
-
 use std::mem;
-use std::num::Float;
-use rand;
-use rand::Rng;
+use std::rand;
+use std::rand::Rng;
 
-mod noise;
+use array2d;
+use array2d::Array2D;
+use math::vectors::Vec2;
+use math::shapes::{Circle, Rect};
+use math::interpolate::Interpolate;
+use noise;
 
 // !!! FIXME: Use proper constants from Rust after numbers library is more stable
 static TAU: f32 = 2.0*3.14159265358979323;
@@ -40,11 +38,11 @@ impl UpperMap {
         randomize_elevation(&mut elevation);
 
         println!("Creating lower resolution land map");
-        let land_map = array2d::from_fn(width/4, height/4, |x, y| {
+        let land_map = array2d::from_fn(width / 4, height / 4, |x, y| {
             let mut acc = 0.0;
             for x_ in range(x*4, x*4 + 4) {
                 for y_ in range(y*4, y*4 + 4) {
-                    acc += elevation.get(x_, y_);
+                    acc += *elevation.get(x_, y_);
                 }
             }
             acc / (4.0 * 4.0)
@@ -55,8 +53,8 @@ impl UpperMap {
         println!("Creating ocean flow base");
         // !!! FIXME: This vector shouldn't be allocated
         // !!! SOLUTION: Perform transformations in flood fill?
-        let ocean_flow_tmp = array2d::from_fn(width/4, height/4, |x, y| {
-                Vec2::from_polar(tmp_map.get(x, y) * TAU / 4.0, 1.0)
+        let ocean_flow_tmp = array2d::from_fn(width / 4, height / 4, |x, y| {
+                Vec2::from_polar(*tmp_map.get(x, y) * TAU / 4.0, 1.0)
         });
         let mut ocean_flow = array2d::from_elem(width/4, height/4, Vec2::zero());
         flood_fill_if_less(&mut ocean_flow, &land_map, 0.0, &ocean_flow_tmp, 0, 0);
@@ -85,14 +83,14 @@ fn create_islands(map: &mut Array2D<f32>, islands: Vec<Circle>) {
             let h = islands.iter().map(|v| radial_fade(*v, pos)).fold(0.0f32, |a, b| a.max(b));
 
             // Split into land and sea
-            if map.get(x, y) * h < SEA_LEVEL {
+            if *map.get(x, y) * h < SEA_LEVEL {
                 // Water
-                let value = -map.get(x, y);
-                map.set(x, y, value);
+                let value = -*map.get(x, y);
+                *map.get_mut(x, y) = value;
             }
             else {
                 // Land
-                map.set(x, y, h);
+                *map.get_mut(x, y) = h;
             }
         }
     }
@@ -121,7 +119,7 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
     let mut rng = rand::weak_rng();
 
     // Simulate for 25 steps
-    for _ in range(0, 25) {
+    for _ in range(0u, 25) {
         // !!! FIXME: This is not very realistic, and limits how much the flow data can change as a
         // result of other factors.
         let mut old = array2d::from_fn(flow_data.width(), flow_data.height(),
@@ -136,7 +134,7 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
                     continue;
                 }
                 // Moving water in ocean
-                else if land_data.get(x, y) < 0.0 {
+                else if *land_data.get(x, y) < 0.0 {
                     let direction = old.get(x, y).unit();
 
                     let offset = Vec2::new(x as f32, y as f32) + direction;
@@ -185,7 +183,7 @@ fn simulate_ocean_flow(land_data: &Array2D<f32>, flow_data: &mut Array2D<Vec2<f3
                     }
 
                     // Remove the water from this tile now
-                    flow_data.set(x, y, Vec2::zero());
+                    *flow_data.get_mut(x, y) = Vec2::zero();
                 }
             }
         }
@@ -212,10 +210,10 @@ fn radial_fade(circle: Circle, point: Vec2<f32>) -> f32 {
     }
 }
 
-fn flood_fill_if_less<A: Clone + Eq, B: Clone + Ord>(target: &mut Array2D<A>, check: &Array2D<B>,
-        thres: B, source: &Array2D<A>, x: uint, y: uint) {
+fn flood_fill_if_less<A: Clone + PartialEq, B: Clone + PartialOrd>(target: &mut Array2D<A>,
+        check: &Array2D<B>, thres: B, source: &Array2D<A>, x: uint, y: uint) {
 
-    if check.get(x, y) > thres {
+    if *check.get(x, y) > thres {
         return;
     }
 
@@ -226,8 +224,8 @@ fn flood_fill_if_less<A: Clone + Eq, B: Clone + Ord>(target: &mut Array2D<A>, ch
             None => break
         };
 
-        if check.get(x, y) <= thres && target.get(x, y) != source.get(x, y) {
-            target.set(x, y, source.get(x, y));
+        if *check.get(x, y) <= thres && *target.get(x, y) != *source.get(x, y) {
+            *target.get_mut(x, y) = source.get(x, y).clone();
 
             if y > 0 { active.push((x, y-1)); }
             if y+1 < check.height() { active.push((x, y+1)); }

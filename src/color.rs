@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use extra2::interpolate::Interpolate;
+use math::interpolate::Interpolate;
 
 /// An RGB color
 #[deriving(Clone)]
@@ -8,6 +8,12 @@ pub struct Rgb {
     pub r: u8,
     pub g: u8,
     pub b: u8
+}
+
+impl Rgb {
+    pub fn to_tuple(&self) -> (u8, u8, u8) {
+        (self.r, self.g, self.b)
+    }
 }
 
 impl Interpolate for Rgb {
@@ -19,7 +25,6 @@ impl Interpolate for Rgb {
         }
     }
 }
-
 
 ///
 /// Color list

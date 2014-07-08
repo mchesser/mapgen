@@ -1,40 +1,35 @@
 #![allow(dead_code)]
-use std::vec::Vec;
+
 use std::slice;
 
 /// A structure for storing a 2D collection of elements
 pub struct Array2D<T> {
-    width_: uint,
-    height_: uint,
+    width: uint,
+    height: uint,
     data: Vec<T>,
 }
 
 impl<T: Clone> Array2D<T> {
     #[inline]
-    /// Get the height of the array
+    /// Returns the height of the array
     /// # Return
     /// The height of the array
     pub fn height(&self) -> uint {
-        self.height_
+        self.height
     }
 
     #[inline]
-    /// Get the width of the array
-    /// # Return
-    /// The width of the array
+    /// Returns the width of the array
     pub fn width(&self) -> uint {
-        self.width_
+        self.width
     }
 
-    // TODO: Fix to use Index trait
     #[inline]
-    /// Get an element in the array
+    /// Returns a reference to the value at index `x`, `y`
     /// # Arguments
     /// `x` - the x coordinate
     /// `y` - the y coordinate
-    /// # Return
-    /// The value at (x, y)
-    pub fn get(&self, x: uint, y: uint) -> T {
+    pub fn get<'a>(&'a self, x: uint, y: uint) -> &'a T {
         if x > self.width() || y > self.height() {
             fail!(
                 format!("Index out of bounds, x: {}, y: {}, width: {} height: {}",
@@ -45,16 +40,15 @@ impl<T: Clone> Array2D<T> {
             );
         }
 
-        self.data.get((x + y * self.width()) as uint).clone()
+        self.data.get((x + y * self.width()) as uint)
     }
 
     #[inline]
-    /// Set an element in the array
+    /// Returns a mutable reference to the value at index `x`, `y`
     /// # Arguments
     /// `x` - the x coordinate
     /// `y` - the y coordinate
-    /// `value` - the value to set
-    pub fn set(&mut self, x: uint, y: uint, value: T) {
+    pub fn get_mut<'a>(&'a mut self, x: uint, y: uint) -> &'a mut T {
         if x > self.width() || y > self.height() {
             fail!(
                 format!("Index out of bounds, x: {}, y: {}, width: {} height: {}",
@@ -64,33 +58,31 @@ impl<T: Clone> Array2D<T> {
                     self.height())
             );
         }
-
-        let index = (x + y * self.width()) as uint;
-        *self.data.get_mut(index) = value;
+        
+        let width = self.width;
+        self.data.get_mut((x + y * width) as uint)
     }
 
-    /// Creates an iterator
-    /// # Return
-    /// Returns an iterator over the elements in the array left-right, up-down
+    /// Returns an iterator over references to the elements of the array in
+    /// the order: left-right, up-down
     pub fn iter<'r>(&'r self) -> slice::Items<'r, T> {
         self.data.iter()
     }
 
-    /// Creates an mutable iterator
-    /// # Return
-    /// Returns an mutable iterator over the elements in the array left-right, up-down
+    /// Returns an iterator over mutable references to the elements of the array in
+    /// the order: left-right, up-down
     pub fn mut_iter<'r>(&'r mut self) -> slice::MutItems<'r, T> {
         self.data.mut_iter()
     }
 }
 
 impl<T: Clone> Clone for Array2D<T> {
-        fn clone(&self) -> Array2D<T> {
-            Array2D {
-                width_:  self.width(),
-                height_: self.height(),
-                data:    self.data.clone()
-            }
+    fn clone(&self) -> Array2D<T> {
+        Array2D {
+            width:  self.width(),
+            height: self.height(),
+            data:   self.data.clone()
+        }
     }
 }
 
@@ -99,13 +91,11 @@ impl<T: Clone> Clone for Array2D<T> {
 /// `width` - The width of the array
 /// `height` - The height of the array
 /// `op` - The function to use
-/// # Return
-/// Returns the array initialised using the function
 pub fn from_fn<T>(width: uint, height: uint, op: |uint, uint| -> T) -> Array2D<T> {
     Array2D {
-        width_: width,
-        height_: height,
-        data: Vec::from_fn(width*height, |i| op(i % width, i / width)),
+        width: width,
+        height: height,
+        data: Vec::from_fn(width * height, |i| op(i % width, i / width)),
     }
 }
 
@@ -114,12 +104,10 @@ pub fn from_fn<T>(width: uint, height: uint, op: |uint, uint| -> T) -> Array2D<T
 /// `width` - The width of the array
 /// `height` - The height of the array
 /// `elem` - The element to use
-/// # Return
-/// Returns the array initialised using with the element
 pub fn from_elem<T:Clone>(width: uint, height: uint, elem: T) -> Array2D<T> {
     Array2D {
-        width_: width,
-        height_: height,
+        width: width,
+        height: height,
         data: Vec::from_elem(width * height, elem.clone())
     }
 }
@@ -131,16 +119,14 @@ pub fn from_elem<T:Clone>(width: uint, height: uint, elem: T) -> Array2D<T> {
 /// `width` - The width of the array
 /// `height` - The height of the array
 /// `raw` - The raw vector
-/// # Return
-/// Returns the array initialised using the function
 pub fn from_raw<T>(width: uint, height: uint, raw: Vec<T>) -> Array2D<T> {
     if width * height != raw.len() {
         fail!("Raw array of invalid length");
     }
 
     Array2D {
-        width_: width,
-        height_: height,
+        width: width,
+        height: height,
         data: raw
     }
 }
@@ -153,8 +139,8 @@ pub fn from_raw<T>(width: uint, height: uint, raw: Vec<T>) -> Array2D<T> {
 /// # Argumens
 /// `target` - the array to normalise
 pub fn normalise(target: &mut Array2D<f32>) {
-    let mut min = target.get(0, 0);
-    let mut max = target.get(0, 0);
+    let mut min = *target.get(0, 0);
+    let mut max = *target.get(0, 0);
 
     for &val in target.iter() {
         if min > val {
@@ -186,7 +172,7 @@ pub fn wrap_get<T: Clone>(target: &Array2D<T>, x: int, y: int) -> T {
         if y < 0 { (target.height() as int + y % target.height() as int) as uint }
         else { y as uint % target.height() };
 
-    target.get(x, y)
+    target.get(x, y).clone()
 }
 
 /// Sets a value in an array, wrapping the x and y values to fit in the domain
@@ -204,5 +190,5 @@ pub fn wrap_set<T: Clone>(target: &mut Array2D<T>, x: int, y: int, value: T) {
         if y < 0 { (target.height() as int + y % target.height() as int) as uint }
         else { y as uint % target.height() };
 
-    target.set(x, y, value)
+    *target.get_mut(x, y) = value;
 }

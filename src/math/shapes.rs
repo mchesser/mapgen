@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use extra2::vectors::Vec2;
+use math::vectors::Vec2;
 
 /// Circle structure, with center and radius
 pub struct Circle {
@@ -17,64 +17,46 @@ pub struct Rect {
 
 impl Rect {
     /// Gets the top left coordinate of the rectangle
-    /// # Return
-    /// The top left coordinate of the rectangle
     pub fn top_left(&self) -> Vec2<f32> {
         Vec2::new(self.top(), self.left())
     }
 
     /// Gets the top right coordinate of the rectangle
-    /// # Return
-    /// The top right coordinate of the rectangle
     pub fn top_right(&self) -> Vec2<f32> {
         Vec2::  new(self.x + self.width, self.y)
     }
 
     /// Gets the bottom left coordinate of the rectangle
-    /// # Return
-    /// The bottom left coordinate of the rectangle
     pub fn bottom_left(&self) -> Vec2<f32> {
         Vec2::new(self.x, self.y + self.height)
     }
 
     /// Gets the bottom right coordinate of the rectangle
-    /// # Return
-    /// The bottom right coordinate of the rectangle
     pub fn bottom_right(&self) -> Vec2<f32> {
         Vec2::new(self.x + self.width, self.y + self.height)
     }
 
     /// Gets the center of the rectangle
-    /// # Return
-    /// The center of the rectangle
     pub fn center(&self) -> Vec2<f32> {
         Vec2::new(self.x + self.width/2.0, self.y + self.height/2.0)
     }
 
     /// Gets the x value of the left of the rectangle
-    /// # Return
-    /// The left of the rectangle
     pub fn left(&self) -> f32 {
         self.x
     }
 
     /// Gets the x value of the right of the rectangle
-    /// # Return
-    /// The right of the rectangle
     pub fn right(&self) -> f32 {
         self.x + self.width
     }
 
     /// Gets the y value of the top of the rectangle
-    /// # Return
-    /// The top of the rectangle
     pub fn top(&self) -> f32 {
         self.y
     }
 
     /// Gets the y value of the bottom of the rectangle
-    /// # Return
-    /// The bottom of the rectangle
     pub fn bottom(&self) -> f32 {
         self.y + self.height
     }
@@ -90,8 +72,6 @@ impl Rect {
     /// Calculate the intersection area of two rectangles
     /// # Arguments
     /// `other` - the rectangle to calculate the intersection with
-    /// # Return
-    /// The intersection area
     pub fn intersect_area(&self, other: &Rect) -> f32 {
         // !!! FIXME: Change to use fmin/fmax once they are working in Rust again
         let x_intersect =
