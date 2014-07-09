@@ -25,11 +25,11 @@ fn elevation_bitmap(map: &mapgen::UpperMap, filename: &str) {
     let land_colors = [color::BEAVER, color::BUFF];
     let sea_colors = [color::AZURE, color::COOL_BLACK];
 
-    let mut image = Bitmap::new(map.elevation.width(), map.elevation.height());
+    let mut image = Bitmap::new(map.elevation.width() as i32, map.elevation.height() as i32);
 
     for (idx, &h) in map.elevation.iter().enumerate() {
-        let x = idx % image.width;
-        let y = idx / image.width;
+        let x = idx as i32 % image.width();
+        let y = idx as i32 / image.width();
 
         // Map colors above (or equal to) 0.0 to land, and below 0.0 to sea
         if h >= 0.0 {
@@ -52,14 +52,14 @@ fn flow_bitmap(map: &mapgen::UpperMap, filename: &str) {
 
     array2d::normalise(&mut len_map);
 
-    let mut bitmap = Bitmap::new(map.ocean_flow.width(), map.ocean_flow.height());
+    let mut bitmap = Bitmap::new(map.ocean_flow.width() as i32, map.ocean_flow.height() as i32);
 
     let land_colors = [color::BEAVER, color::BUFF];
     let sea_colors = [color::AZURE, color::BLACK];
 
     for (idx, (flow, elev)) in len_map.iter().zip(map.elevation.iter()).enumerate() {
-        let x = idx % bitmap.width;
-        let y = idx / bitmap.width;
+        let x = idx as i32 % bitmap.width();
+        let y = idx as i32 / bitmap.width();
 
         if *elev >= 0.0 {
             bitmap.set_pixel(x, y, color::linear_gradient(land_colors, *elev as f64).to_tuple());
