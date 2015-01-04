@@ -1,0 +1,18 @@
+[root]
+name = "mapgen"
+version = "0.0.1"
+dependencies = [
+ "bitmap 0.0.2 (git+https://github.com/quvarxa/bitmap.git)",
+ "noise 0.0.3 (git+https://github.com/bjz/noise-rs)",
+]
+
+[[package]]
+name = "bitmap"
+version = "0.0.2"
+source = "git+https://github.com/quvarxa/bitmap.git#1504d593234d727f3f29b2a78bea223fc1d6907b"
+
+[[package]]
+name = "noise"
+version = "0.0.3"
+source = "git+https://github.com/bjz/noise-rs#fe817a9dc49555d0bdf58bb6b28f4dce1258b003"
+

@@ -1,14 +1,10 @@
 [package]
-
 name = "mapgen"
 version = "0.0.1"
 authors = ["Michael Chesser"]
 
-[[bin]]
-
-name = "mapgen"
-path = "src/main.rs"
-
 [dependencies.bitmap]
-
 git = "https://github.com/quvarxa/bitmap.git"
+
+[dependencies.noise]
+git = "https://github.com/bjz/noise-rs"
