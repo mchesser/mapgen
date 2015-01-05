@@ -1,4 +1,4 @@
-#![feature(slicing_syntax)]
+#![feature(slicing_syntax, associated_types, default_type_params)]
 
 extern crate bitmap;
 extern crate noise;
@@ -13,7 +13,7 @@ mod wrapping2darray;
 mod mapgen;
 
 fn main() {
-    const SIZE: i32 = 256*8;
+    const SIZE: i32 = 256*2;
     let test = mapgen::UpperMap::new(SIZE, SIZE);
 
     println!("Saving elevation map");

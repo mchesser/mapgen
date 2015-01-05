@@ -1,5 +1,5 @@
 use std::fmt;
-use std::num::{zero, one, Float, FloatMath, Primitive};
+use std::num::{Float, FloatMath};
 use std::ops::{Add, Sub, Mul};
 use math::interpolate::Interpolate;
 
@@ -16,39 +16,36 @@ impl<T> Vec2<T> {
     }
 }
 
-impl<T: Primitive> Vec2<T> {
+impl<T: Float> Vec2<T> {
     /// Create a new vector of length 0
     pub fn zero() -> Vec2<T> {
-        Vec2 { x: zero(), y: zero() }
+        Vec2 { x: Float::zero(), y: Float::zero() }
     }
 
     /// Create the unit vector in the x direction
     pub fn unit_x() -> Vec2<T> {
-        Vec2 { x: one(), y: zero() }
+        Vec2 { x: Float::one(), y: Float::zero() }
     }
 
     /// Create the unit vector in the y direction
     pub fn unit_y() -> Vec2<T> {
-        Vec2 { x: zero(), y: one() }
+        Vec2 { x: Float::zero(), y: Float::one() }
     }
 }
 
-// TODO: Fix when associative types work better
-impl<T> Add<Vec2<T>, Vec2<T>> for Vec2<T> where T: Add<T, T> {
-    /// Adds two vectors togeather
+impl<T> Add for Vec2<T> where T: Add<Output=T> {
+    type Output = Vec2<T>;
     fn add(self, rhs: Vec2<T>) -> Vec2<T> {
         Vec2::new(self.x + rhs.x, self.y + rhs.y)
     }
 }
 
-// TODO: Fix when associative types work better
-impl<T> Sub<Vec2<T>, Vec2<T>> for Vec2<T> where T: Sub<T, T> {
-    /// Subtracts one vector from another
+impl<T> Sub for Vec2<T> where T: Sub<Output=T> {
+    type Output = Vec2<T>;
     fn sub(self, rhs: Vec2<T>) -> Vec2<T> {
         Vec2::new(self.x - rhs.x, self.y - rhs.y)
     }
 }
-
 
 impl<T: Float + FloatMath> Vec2<T> {
     /// Create a new vector from polar coordinates
@@ -99,7 +96,7 @@ impl<T: Float + FloatMath> Vec2<T> {
     }
 }
 
-impl<T: Mul<T, T> + Copy> Vec2<T> {
+impl<T> Vec2<T> where T: Copy + Mul<Output=T> {
     /// Creates a new vector equal to the vector scaled by a scalar value
     pub fn scale(&self, scalar: T) -> Vec2<T> {
         Vec2::new(self.x * scalar, self.y * scalar)
