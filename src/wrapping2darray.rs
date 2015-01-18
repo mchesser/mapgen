@@ -1,5 +1,6 @@
 use std::slice;
 use std::iter;
+use std::ops::{Index, IndexMut};
 
 /// A structure for storing a 2D collection of elements where the edges of the array wrap.
 pub struct Wrapping2DArray<T> {
@@ -17,7 +18,6 @@ impl<T: Clone> Wrapping2DArray<T> {
             height: height,
             data: iter::repeat(elem).take((width * height) as usize).collect(),
         }
-
     }
 
     pub fn from_fn<F>(width: i32, height: i32, mut f: F) -> Wrapping2DArray<T>
@@ -27,7 +27,7 @@ impl<T: Clone> Wrapping2DArray<T> {
         Wrapping2DArray {
             width: width,
             height: height,
-            data: range(0, width * height).map(|i| f(i % width, i / width)).collect(),
+            data: (0..(width * height)).map(|i| f(i % width, i / width)).collect(),
         }
     }
 
@@ -41,8 +41,24 @@ impl<T: Clone> Wrapping2DArray<T> {
         self.width
     }
 
-    /// Returns a reference to the value at index `x`, `y`
-    pub fn get(&self, x: i32, y: i32) -> &T {
+    /// Returns an iterator over references to the elements of the array in
+    /// the order: left-right, up-down
+    pub fn iter<'r>(&'r self) -> slice::Iter<'r, T> {
+        self.data.iter()
+    }
+
+    /// Returns an iterator over mutable references to the elements of the array in
+    /// the order: left-right, up-down
+    pub fn iter_mut<'r>(&'r mut self) -> slice::IterMut<'r, T> {
+        self.data.iter_mut()
+    }
+}
+
+impl<T> Index<(i32, i32)> for Wrapping2DArray<T> {
+    type Output = T;
+
+    fn index(&self, index: &(i32, i32)) -> &T {
+        let &(x, y) = index;
         let wrapped_x = {
             if x >= 0 { x % self.width }
             else { self.width + x % self.width }
@@ -54,9 +70,13 @@ impl<T: Clone> Wrapping2DArray<T> {
 
         &self.data[(wrapped_x + wrapped_y * self.width) as usize]
     }
+}
 
-    /// Returns a mutable reference to the value at index `x`, `y`
-    pub fn get_mut<'a>(&'a mut self, x: i32, y: i32) -> &'a mut T {
+impl<T> IndexMut<(i32, i32)> for Wrapping2DArray<T> {
+    type Output = T;
+
+    fn index_mut(&mut self, index: &(i32, i32)) -> &mut T {
+        let &(x, y) = index;
         let wrapped_x = {
             if x >= 0 { x % self.width }
             else { self.width + x % self.width }
@@ -67,18 +87,6 @@ impl<T: Clone> Wrapping2DArray<T> {
         };
 
         &mut self.data[(wrapped_x + wrapped_y * self.width) as usize]
-    }
-
-    /// Returns an iterator over references to the elements of the array in
-    /// the order: left-right, up-down
-    pub fn iter<'r>(&'r self) -> slice::Iter<'r, T> {
-        self.data.iter()
-    }
-
-    /// Returns an iterator over mutable references to the elements of the array in
-    /// the order: left-right, up-down
-    pub fn iter_mut<'r>(&'r mut self) -> slice::IterMut<'r, T> {
-        self.data.iter_mut()
     }
 }
 

@@ -46,7 +46,7 @@ fn elevation_bitmap(map: &mapgen::UpperMap, filename: &str) -> IoResult<()> {
 /// Produce a flow bitmap
 fn flow_bitmap(map: &mapgen::UpperMap, filename: &str) -> IoResult<()> {
     let mut len_map = Wrapping2DArray::from_fn(map.ocean_flow.width(), map.ocean_flow.height(),
-            |x, y| map.ocean_flow.get(x, y).length());
+            |x, y| map.ocean_flow[(x, y)].length());
     mapgen::normalise(&mut len_map);
 
     let mut bitmap = Bitmap::new(map.ocean_flow.width() as i32, map.ocean_flow.height() as i32);

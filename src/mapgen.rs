@@ -72,14 +72,14 @@ fn create_islands(map: &mut Wrapping2DArray<f32>, islands: Vec<Circle>) {
             let h = islands.iter().map(|v| radial_fade(*v, pos)).fold(0.0f32, |a, b| a.max(b));
 
             // Split into land and sea
-            if *map.get(x, y) * h < SEA_LEVEL {
+            if map[(x, y)] * h < SEA_LEVEL {
                 // Water
-                let value = -*map.get(x, y);
-                *map.get_mut(x, y) = value;
+                let value = -map[(x, y)];
+                map[(x, y)] = value;
             }
             else {
                 // Land
-                *map.get_mut(x, y) = h;
+                map[(x, y)] = h;
             }
         }
     }
@@ -117,19 +117,19 @@ fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>, flow_data: &mut Wrappin
         // !!! FIXME: This is not very realistic, and limits how much the flow data can change as a
         // result of other factors.
         let mut old = Wrapping2DArray::from_fn(flow_data.width(), flow_data.height(),
-                |x, y| source_flow.get(x, y).scale(0.1));
+                |x, y| source_flow[(x, y)].scale(0.1));
 
         mem::swap(flow_data, &mut old);
 
         for x in (0..old.width()) {
             for y in (0..old.height()) {
                 // No water on this square
-                if old.get(x, y).length_sqr() == 0.0 {
+                if old[(x, y)].length_sqr() == 0.0 {
                     continue;
                 }
                 // Moving water in ocean
-                else if *land_data.get(x, y) < 0.0 {
-                    let direction = old.get(x, y).unit();
+                else if land_data[(x, y)] < 0.0 {
+                    let direction = old[(x, y)].unit();
                     //print!("{}", direction);
 
                     let offset = Vec2::new(x as f32, y as f32) + direction;
@@ -143,8 +143,8 @@ fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>, flow_data: &mut Wrappin
                         let grid_rect = Rect { x: nx as f32, y: ny as f32, width: 1.0, height: 1.0 };
                         let factor = water_rect.intersect_area(&grid_rect);
 
-                        let prev = *flow_data.get(nx, ny);
-                        *flow_data.get_mut(nx, ny) = prev + old.get(x, y).scale(factor);
+                        let prev = flow_data[(nx, ny)];
+                        flow_data[(nx, ny)] = prev + old[(x, y)].scale(factor);
                     }
                 }
                 // Moving water on land
@@ -156,7 +156,7 @@ fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>, flow_data: &mut Wrappin
                         let nx = x + dx;
                         let ny = y + dy;
 
-                        *land_data.get(nx, ny) < 0.0
+                        land_data[(nx, ny)] < 0.0
                     }).collect();
 
                     // !!! FIXME: This should be handled correctly
@@ -173,12 +173,12 @@ fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>, flow_data: &mut Wrappin
                         let mut flow = Vec2::new(dx as f32, dy as f32).unit().scale(factor);
                         flow.rotate(TAU / 10.0 * (rng.gen::<f32>() * 2.0 - 1.0));
 
-                        let prev = *flow_data.get(nx, ny);
-                        *flow_data.get_mut(nx, ny) = prev + flow;
+                        let prev = flow_data[(nx, ny)];
+                        flow_data[(nx, ny)] = prev + flow;
                     }
 
                     // Remove the water from this tile now
-                    *flow_data.get_mut(x, y) = Vec2::zero();
+                    flow_data[(x, y)] = Vec2::zero();
                 }
             }
         }
@@ -205,7 +205,7 @@ fn radial_fade(circle: Circle, point: Vec2<f32>) -> f32 {
 fn flood_fill_if_less<A, B>(target: &mut Wrapping2DArray<A>, check: &Wrapping2DArray<B>, thres: B,
     source: &Wrapping2DArray<A>, x: i32, y: i32) where A: Clone + PartialEq, B: Clone + PartialOrd
 {
-    if *check.get(x, y) > thres {
+    if check[(x, y)] > thres {
         return;
     }
 
@@ -216,8 +216,8 @@ fn flood_fill_if_less<A, B>(target: &mut Wrapping2DArray<A>, check: &Wrapping2DA
             None => break
         };
 
-        if *check.get(x, y) <= thres && *target.get(x, y) != *source.get(x, y) {
-            *target.get_mut(x, y) = source.get(x, y).clone();
+        if check[(x, y)] <= thres && target[(x, y)] != source[(x, y)] {
+            target[(x, y)] = source[(x, y)].clone();
 
             if y > 0 { active.push((x, y-1)); }
             if y+1 < check.height() { active.push((x, y+1)); }
@@ -228,8 +228,8 @@ fn flood_fill_if_less<A, B>(target: &mut Wrapping2DArray<A>, check: &Wrapping2DA
 }
 
 pub fn normalise(target: &mut Wrapping2DArray<f32>) {
-    let mut min = *target.get(0, 0);
-    let mut max = *target.get(0, 0);
+    let mut min = target[(0, 0)];
+    let mut max = target[(0, 0)];
 
     for &val in target.iter() {
         if min > val {
@@ -251,8 +251,8 @@ fn upscale<T: Interpolate + Clone>(input: &Wrapping2DArray<T>, scale: i32) -> Wr
         let in_y = (y / scale) as i32;
 
         let values = [
-            [input.get(in_x, in_y).clone(), input.get(in_x, in_y + 1).clone()],
-            [input.get(in_x + 1, in_y).clone(), input.get(in_x + 1, in_y + 1).clone()],
+            [input[(in_x, in_y)].clone(), input[(in_x, in_y + 1)].clone()],
+            [input[(in_x + 1, in_y)].clone(), input[(in_x + 1, in_y + 1)].clone()],
         ];
 
         let dx = ((x % scale) as f64) / (scale as f64);
