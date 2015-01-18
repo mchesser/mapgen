@@ -69,19 +69,19 @@ pub fn linear_gradient(colors: &[Rgb], x: f64) -> Rgb {
 
     if x == 0.0 {
         match colors.first() {
-            Some(color) => return *color,
+            Some(&c) => return c,
             None => unreachable!()
         }
     }
     else if x == 1.0 {
         match colors.last() {
-            Some(color) => return *color,
+            Some(&c) => return c,
             None => unreachable!()
         }
     }
 
     let band_width = (colors.len() - 1) as f64;
-    let c1 = (x * band_width) as uint;
+    let c1 = (x * band_width) as usize;
     let c2 = c1 + 1;
     let x_new = 1.0 - (x * band_width - (c1 as f64));
     Interpolate::lerp([colors[c2], colors[c1]], x_new)

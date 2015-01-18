@@ -1,5 +1,3 @@
-#![feature(slicing_syntax, associated_types, default_type_params)]
-
 extern crate bitmap;
 extern crate noise;
 

@@ -1,7 +1,7 @@
-use std::num::FloatMath;
+use std::num::Float;
 use std::mem;
-use std::rand;
-use std::rand::Rng;
+use std::rand::{self, Rng};
+use std::f32::consts::PI_2 as TAU;
 
 use wrapping2darray::Wrapping2DArray;
 
@@ -11,8 +11,6 @@ use math::interpolate::Interpolate;
 
 use noise::Seed;
 use noise::{perlin2, Brownian2};
-
-static TAU: f32 = 2.0*3.14159265358979323;
 
 pub struct UpperMap {
     pub elevation: Wrapping2DArray<f32>,
@@ -30,7 +28,7 @@ impl UpperMap {
         ];
 
         println!("Generating island noise");
-        let seed = Seed::new(12345);
+        let seed = Seed::new(212345);
         let noise_gen = Brownian2::new(perlin2, 8).wavelength(width as f64 / 4.0);
         let mut elevation = Wrapping2DArray::from_fn(width, height, |x, y| {
             noise_gen(&seed, &[x as f64, y as f64]) as f32
@@ -66,8 +64,8 @@ impl UpperMap {
 /// Creates base islands for the map
 fn create_islands(map: &mut Wrapping2DArray<f32>, islands: Vec<Circle>) {
     const SEA_LEVEL: f32 = 0.32;
-    for x in range(0, map.width()) {
-        for y in range(0, map.height()) {
+    for x in (0..map.width()) {
+        for y in (0..map.height()) {
             let pos = Vec2::new(x as f32, y as f32);
 
             // Get the elevation factor of the island that affects the point the most
@@ -115,7 +113,7 @@ fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>, flow_data: &mut Wrappin
     let mut rng = rand::weak_rng();
 
     // Simulate for 25 steps
-    for _ in range(0u, 25) {
+    for _ in 0..25 {
         // !!! FIXME: This is not very realistic, and limits how much the flow data can change as a
         // result of other factors.
         let mut old = Wrapping2DArray::from_fn(flow_data.width(), flow_data.height(),
@@ -123,8 +121,8 @@ fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>, flow_data: &mut Wrappin
 
         mem::swap(flow_data, &mut old);
 
-        for x in range(0, old.width()) {
-            for y in range(0, old.height()) {
+        for x in (0..old.width()) {
+            for y in (0..old.height()) {
                 // No water on this square
                 if old.get(x, y).length_sqr() == 0.0 {
                     continue;

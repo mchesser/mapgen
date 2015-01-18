@@ -1,5 +1,5 @@
 use std::fmt;
-use std::num::{Float, FloatMath};
+use std::num::Float;
 use std::ops::{Add, Sub, Mul};
 use math::interpolate::Interpolate;
 
@@ -31,23 +31,7 @@ impl<T: Float> Vec2<T> {
     pub fn unit_y() -> Vec2<T> {
         Vec2 { x: Float::zero(), y: Float::one() }
     }
-}
 
-impl<T> Add for Vec2<T> where T: Add<Output=T> {
-    type Output = Vec2<T>;
-    fn add(self, rhs: Vec2<T>) -> Vec2<T> {
-        Vec2::new(self.x + rhs.x, self.y + rhs.y)
-    }
-}
-
-impl<T> Sub for Vec2<T> where T: Sub<Output=T> {
-    type Output = Vec2<T>;
-    fn sub(self, rhs: Vec2<T>) -> Vec2<T> {
-        Vec2::new(self.x - rhs.x, self.y - rhs.y)
-    }
-}
-
-impl<T: Float + FloatMath> Vec2<T> {
     /// Create a new vector from polar coordinates
     pub fn from_polar(angle: T, mag: T) -> Vec2<T> {
         let (sin_a, cos_a) = angle.sin_cos();
@@ -96,6 +80,20 @@ impl<T: Float + FloatMath> Vec2<T> {
     }
 }
 
+impl<T> Add for Vec2<T> where T: Add<Output=T> {
+    type Output = Vec2<T>;
+    fn add(self, rhs: Vec2<T>) -> Vec2<T> {
+        Vec2::new(self.x + rhs.x, self.y + rhs.y)
+    }
+}
+
+impl<T> Sub for Vec2<T> where T: Sub<Output=T> {
+    type Output = Vec2<T>;
+    fn sub(self, rhs: Vec2<T>) -> Vec2<T> {
+        Vec2::new(self.x - rhs.x, self.y - rhs.y)
+    }
+}
+
 impl<T> Vec2<T> where T: Copy + Mul<Output=T> {
     /// Creates a new vector equal to the vector scaled by a scalar value
     pub fn scale(&self, scalar: T) -> Vec2<T> {
@@ -103,7 +101,7 @@ impl<T> Vec2<T> where T: Copy + Mul<Output=T> {
     }
 }
 
-impl<T: fmt::Show> fmt::Show for Vec2<T> {
+impl<T: fmt::String> fmt::String for Vec2<T> {
     /// Provides a string representation of the vector
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[{}, {}]", self.x, self.y)

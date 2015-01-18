@@ -9,10 +9,10 @@ dependencies = [
 [[package]]
 name = "bitmap"
 version = "0.0.2"
-source = "git+https://github.com/quvarxa/bitmap.git#1504d593234d727f3f29b2a78bea223fc1d6907b"
+source = "git+https://github.com/quvarxa/bitmap.git#7ab1ef545ecd0f96cf681f9862834e0009d08d1d"
 
 [[package]]
 name = "noise"
 version = "0.0.3"
-source = "git+https://github.com/bjz/noise-rs#fe817a9dc49555d0bdf58bb6b28f4dce1258b003"
+source = "git+https://github.com/bjz/noise-rs#52ab85af658b2611fa798705fd5b06ba58fdc037"
 

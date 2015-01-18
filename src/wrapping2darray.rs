@@ -15,7 +15,7 @@ impl<T: Clone> Wrapping2DArray<T> {
         Wrapping2DArray {
             width: width,
             height: height,
-            data: iter::repeat(elem).take((width * height) as uint).collect(),
+            data: iter::repeat(elem).take((width * height) as usize).collect(),
         }
 
     }
@@ -52,7 +52,7 @@ impl<T: Clone> Wrapping2DArray<T> {
             else { self.height + y % self.height }
         };
 
-        &self.data[(wrapped_x + wrapped_y * self.width) as uint]
+        &self.data[(wrapped_x + wrapped_y * self.width) as usize]
     }
 
     /// Returns a mutable reference to the value at index `x`, `y`
@@ -66,18 +66,18 @@ impl<T: Clone> Wrapping2DArray<T> {
             else { self.height + y % self.height }
         };
 
-        &mut self.data[(wrapped_x + wrapped_y * self.width) as uint]
+        &mut self.data[(wrapped_x + wrapped_y * self.width) as usize]
     }
 
     /// Returns an iterator over references to the elements of the array in
     /// the order: left-right, up-down
-    pub fn iter<'r>(&'r self) -> slice::Items<'r, T> {
+    pub fn iter<'r>(&'r self) -> slice::Iter<'r, T> {
         self.data.iter()
     }
 
     /// Returns an iterator over mutable references to the elements of the array in
     /// the order: left-right, up-down
-    pub fn iter_mut<'r>(&'r mut self) -> slice::MutItems<'r, T> {
+    pub fn iter_mut<'r>(&'r mut self) -> slice::IterMut<'r, T> {
         self.data.iter_mut()
     }
 }
