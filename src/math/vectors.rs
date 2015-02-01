@@ -101,7 +101,7 @@ impl<T> Vec2<T> where T: Copy + Mul<Output=T> {
     }
 }
 
-impl<T: fmt::String> fmt::String for Vec2<T> {
+impl<T: fmt::Display> fmt::Display for Vec2<T> {
     /// Provides a string representation of the vector
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[{}, {}]", self.x, self.y)

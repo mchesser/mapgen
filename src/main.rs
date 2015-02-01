@@ -1,7 +1,8 @@
+#![feature(core, rand, std_misc)]
 extern crate bitmap;
 extern crate noise;
 
-use std::io::IoResult;
+use std::old_io::IoResult;
 use bitmap::Bitmap;
 use wrapping2darray::Wrapping2DArray;
 
