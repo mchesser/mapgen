@@ -1,6 +1,6 @@
 use std::num::Float;
 use std::mem;
-use std::rand::{self, Rng};
+use rand::{self, Rng};
 use std::f32::consts::PI_2 as TAU;
 
 use wrapping2darray::Wrapping2DArray;

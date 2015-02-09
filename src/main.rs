@@ -1,6 +1,7 @@
-#![feature(core, rand, std_misc)]
+#![feature(core, std_misc)]
 extern crate bitmap;
 extern crate noise;
+extern crate rand;
 
 use std::old_io::IoResult;
 use bitmap::Bitmap;

@@ -8,3 +8,6 @@ git = "https://github.com/quvarxa/bitmap.git"
 
 [dependencies.noise]
 git = "https://github.com/bjz/noise-rs"
+
+[dependencies]
+rand = "*"

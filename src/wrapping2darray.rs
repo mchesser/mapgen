@@ -73,8 +73,6 @@ impl<T> Index<(i32, i32)> for Wrapping2DArray<T> {
 }
 
 impl<T> IndexMut<(i32, i32)> for Wrapping2DArray<T> {
-    type Output = T;
-
     fn index_mut(&mut self, index: &(i32, i32)) -> &mut T {
         let &(x, y) = index;
         let wrapped_x = {
