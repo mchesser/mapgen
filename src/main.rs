@@ -1,4 +1,4 @@
-#![feature(core, std_misc)]
+#![feature(core, old_io, std_misc)]
 extern crate bitmap;
 extern crate noise;
 extern crate rand;

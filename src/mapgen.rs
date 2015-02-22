@@ -69,7 +69,7 @@ fn create_islands(map: &mut Wrapping2DArray<f32>, islands: Vec<Circle>) {
             let pos = Vec2::new(x as f32, y as f32);
 
             // Get the elevation factor of the island that affects the point the most
-            let h = islands.iter().map(|v| radial_fade(*v, pos)).fold(0.0f32, |a, b| a.max(b));
+            let h = islands.iter().map(|&v| radial_fade(v, pos)).fold(0.0f32, |a, b| a.max(b));
 
             // Split into land and sea
             if map[(x, y)] * h < SEA_LEVEL {
@@ -102,7 +102,9 @@ fn randomize_elevation(map: &mut Wrapping2DArray<f32>) {
 }
 
 /// Simulates ocean flow, based on initial flow data and land data
-fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>, flow_data: &mut Wrapping2DArray<Vec2<f32>>) {
+fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>,
+    flow_data: &mut Wrapping2DArray<Vec2<f32>>)
+{
     // A list of the possible adjacent tiles
     static ADJ: [(i32, i32); 9] =
             [(-1, -1), ( 0, -1), ( 1, -1),
@@ -136,7 +138,7 @@ fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>, flow_data: &mut Wrappin
                     let water_rect = Rect { x: offset.x, y: offset.y, width: 1.0, height: 1.0 };
 
                     // !!! FIXME: Could be made much more efficient
-                    for &(dx, dy) in ADJ.iter() {
+                    for &(dx, dy) in &ADJ[..] {
                         let nx = x + dx;
                         let ny = y + dy;
 
@@ -152,11 +154,8 @@ fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>, flow_data: &mut Wrappin
                     // Water is on land, determine which way the sea is to push it back out that way
 
                     // !!! FIXME: Doesn't seem very efficient...
-                    let ocean_tiles: Vec<&(i32, i32)> = ADJ.iter().filter(|& &(dx, dy)| {
-                        let nx = x + dx;
-                        let ny = y + dy;
-
-                        land_data[(nx, ny)] < 0.0
+                    let ocean_tiles: Vec<_> = ADJ.iter().cloned().filter(|&(dx, dy)| {
+                        land_data[(x + dx, y + dy)] < 0.0
                     }).collect();
 
                     // !!! FIXME: This should be handled correctly
@@ -167,7 +166,7 @@ fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>, flow_data: &mut Wrappin
 
                     // !!! FIXME: This doesn't look so great, and doesn't affect some things enough
                     let factor = 0.5 / ocean_tiles.len() as f32;
-                    for & &(dx, dy) in ocean_tiles.iter() {
+                    for &(dx, dy) in &ocean_tiles {
                         let nx = x + dx;
                         let ny = y + dy;
                         let mut flow = Vec2::new(dx as f32, dy as f32).unit().scale(factor);
@@ -203,7 +202,9 @@ fn radial_fade(circle: Circle, point: Vec2<f32>) -> f32 {
 }
 
 fn flood_fill_if_less<A, B>(target: &mut Wrapping2DArray<A>, check: &Wrapping2DArray<B>, thres: B,
-    source: &Wrapping2DArray<A>, x: i32, y: i32) where A: Clone + PartialEq, B: Clone + PartialOrd
+    source: &Wrapping2DArray<A>, x: i32, y: i32)
+    where A: Clone + PartialEq,
+          B: Clone + PartialOrd
 {
     if check[(x, y)] > thres {
         return;
@@ -245,7 +246,9 @@ pub fn normalise(target: &mut Wrapping2DArray<f32>) {
     }
 }
 
-fn upscale<T: Interpolate + Clone>(input: &Wrapping2DArray<T>, scale: i32) -> Wrapping2DArray<T> {
+fn upscale<T>(input: &Wrapping2DArray<T>, scale: i32) -> Wrapping2DArray<T>
+    where T: Interpolate
+{
     Wrapping2DArray::from_fn(input.width() * scale, input.height() * scale, |x, y| {
         let in_x = (x / scale) as i32;
         let in_y = (y / scale) as i32;
