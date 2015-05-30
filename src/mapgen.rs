@@ -1,7 +1,8 @@
-use std::num::Float;
 use std::mem;
-use rand::{self, Rng};
 use std::f32::consts::PI_2 as TAU;
+
+use rand::{self, Rng};
+use num::Float;
 
 use wrapping2darray::Wrapping2DArray;
 
@@ -29,9 +30,9 @@ impl UpperMap {
 
         println!("Generating island noise");
         let seed = Seed::new(212345);
-        let noise_gen = Brownian2::new(perlin2, 8).wavelength(width as f64 / 4.0);
+        let noise = Brownian2::new(perlin2, 8).wavelength(width as f64 / 4.0);
         let mut elevation = Wrapping2DArray::from_fn(width, height, |x, y| {
-            noise_gen(&seed, &[x as f64, y as f64]) as f32
+            noise.apply(&seed, &[x as f64, y as f64]) as f32
         });
         normalise(&mut elevation);
 
@@ -43,9 +44,9 @@ impl UpperMap {
 
         println!("Creating ocean flow map");
         let seed = Seed::new(12346);
-        let noise_gen = Brownian2::new(perlin2, 8).frequency(0.02);
+        let noise = Brownian2::new(perlin2, 8).frequency(0.02);
         let ocean_flow_tmp = Wrapping2DArray::from_fn(width, height, |x, y| {
-            let angle = noise_gen(&seed, &[x as f64, y as f64]) as f32 * TAU / 4.0;
+            let angle = noise.apply(&seed, &[x as f64, y as f64]) as f32 * TAU / 4.0;
             Vec2::from_polar(angle, 0.5)
         });
         let mut ocean_flow = Wrapping2DArray::from_elem(width, height, Vec2::zero());
@@ -88,9 +89,9 @@ fn create_islands(map: &mut Wrapping2DArray<f32>, islands: Vec<Circle>) {
 /// Randomises the elevation in the islands
 fn randomize_elevation(map: &mut Wrapping2DArray<f32>) {
     let seed = Seed::new(12347);
-    let noise_gen = Brownian2::new(perlin2, 8).frequency(0.02);
+    let noise = Brownian2::new(perlin2, 8).frequency(0.02);
     let mut rand_map = Wrapping2DArray::from_fn(map.width(), map.height(), |x, y| {
-        noise_gen(&seed, &[x as f64, y as f64]) as f32
+        noise.apply(&seed, &[x as f64, y as f64]) as f32
     });
     normalise(&mut rand_map);
 

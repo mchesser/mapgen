@@ -1,7 +1,9 @@
-#![feature(core, fs, io, std_misc)]
+#![feature(core)]
+
 extern crate bitmap;
 extern crate noise;
 extern crate rand;
+extern crate num;
 
 use std::io;
 use std::fs::File;

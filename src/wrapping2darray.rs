@@ -57,8 +57,8 @@ impl<T: Clone> Wrapping2DArray<T> {
 impl<T> Index<(i32, i32)> for Wrapping2DArray<T> {
     type Output = T;
 
-    fn index(&self, index: &(i32, i32)) -> &T {
-        let &(x, y) = index;
+    fn index(&self, index: (i32, i32)) -> &T {
+        let (x, y) = index;
         let wrapped_x = {
             if x >= 0 { x % self.width }
             else { self.width + x % self.width }
@@ -73,8 +73,8 @@ impl<T> Index<(i32, i32)> for Wrapping2DArray<T> {
 }
 
 impl<T> IndexMut<(i32, i32)> for Wrapping2DArray<T> {
-    fn index_mut(&mut self, index: &(i32, i32)) -> &mut T {
-        let &(x, y) = index;
+    fn index_mut(&mut self, index: (i32, i32)) -> &mut T {
+        let (x, y) = index;
         let wrapped_x = {
             if x >= 0 { x % self.width }
             else { self.width + x % self.width }

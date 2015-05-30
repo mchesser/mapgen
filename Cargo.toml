@@ -11,3 +11,4 @@ git = "https://github.com/bjz/noise-rs"
 
 [dependencies]
 rand = "*"
+num = "*"
