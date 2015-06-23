@@ -9,6 +9,12 @@ git = "https://github.com/quvarxa/bitmap.git"
 [dependencies.noise]
 git = "https://github.com/bjz/noise-rs"
 
+[dependencies.interpolate]
+git = "https://github.com/quvarxa/interpolate.git"
+
+[dependencies.basic2d]
+git = "https://github.com/quvarxa/basic2d.git"
+
 [dependencies]
 rand = "*"
 num = "*"

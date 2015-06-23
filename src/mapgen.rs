@@ -1,25 +1,21 @@
 use std::mem;
 use std::f32::consts::PI_2 as TAU;
 
-use rand::{self, Rng};
 use num::Float;
-
-use wrapping2darray::Wrapping2DArray;
-
-use math::vectors::Vec2;
-use math::shapes::{Circle, Rect};
-use math::interpolate::Interpolate;
-
+use rand::{self, Rng};
 use noise::Seed;
 use noise::{perlin2, Brownian2};
 
+use basic2d::{Vec2, Circle, Rect, Grid, WrappingGrid};
+use interpolate::Interpolate;
+
 pub struct UpperMap {
-    pub elevation: Wrapping2DArray<f32>,
-    pub ocean_flow: Wrapping2DArray<Vec2<f32>>,
+    pub elevation: WrappingGrid<f32>,
+    pub ocean_flow: WrappingGrid<Vec2<f32>>,
 }
 
 impl UpperMap {
-    pub fn new(width: i32, height: i32) -> UpperMap {
+    pub fn new(width: usize, height: usize) -> UpperMap {
         // !!! FIXME: Probably want to have more than one main island
         let islands = vec![
             Circle {
@@ -31,10 +27,11 @@ impl UpperMap {
         println!("Generating island noise");
         let seed = Seed::new(212345);
         let noise = Brownian2::new(perlin2, 8).wavelength(width as f64 / 4.0);
-        let mut elevation = Wrapping2DArray::from_fn(width, height, |x, y| {
+        let mut elevation = WrappingGrid::new(Grid::from_fn(width, height, |x, y| {
             noise.apply(&seed, &[x as f64, y as f64]) as f32
-        });
-        normalise(&mut elevation);
+        }));
+
+        normalise(&mut *elevation);
 
         println!("Generating islands");
         create_islands(&mut elevation, islands);
@@ -45,11 +42,11 @@ impl UpperMap {
         println!("Creating ocean flow map");
         let seed = Seed::new(12346);
         let noise = Brownian2::new(perlin2, 8).frequency(0.02);
-        let ocean_flow_tmp = Wrapping2DArray::from_fn(width, height, |x, y| {
+        let ocean_flow_tmp = WrappingGrid::new(Grid::from_fn(width, height, |x, y| {
             let angle = noise.apply(&seed, &[x as f64, y as f64]) as f32 * TAU / 4.0;
             Vec2::from_polar(angle, 0.5)
-        });
-        let mut ocean_flow = Wrapping2DArray::from_elem(width, height, Vec2::zero());
+        }));
+        let mut ocean_flow = WrappingGrid::new(Grid::from_elem(width, height, Vec2::zero()));
         flood_fill_if_less(&mut ocean_flow, &elevation, 0.0, &ocean_flow_tmp, 0, 0);
 
         println!("Simulating ocean flow");
@@ -63,7 +60,7 @@ impl UpperMap {
 }
 
 /// Creates base islands for the map
-fn create_islands(map: &mut Wrapping2DArray<f32>, islands: Vec<Circle>) {
+fn create_islands(map: &mut Grid<f32>, islands: Vec<Circle>) {
     const SEA_LEVEL: f32 = 0.32;
     for x in (0..map.width()) {
         for y in (0..map.height()) {
@@ -87,12 +84,12 @@ fn create_islands(map: &mut Wrapping2DArray<f32>, islands: Vec<Circle>) {
 }
 
 /// Randomises the elevation in the islands
-fn randomize_elevation(map: &mut Wrapping2DArray<f32>) {
+fn randomize_elevation(map: &mut WrappingGrid<f32>) {
     let seed = Seed::new(12347);
     let noise = Brownian2::new(perlin2, 8).frequency(0.02);
-    let mut rand_map = Wrapping2DArray::from_fn(map.width(), map.height(), |x, y| {
+    let mut rand_map = WrappingGrid::new(Grid::from_fn(map.width(), map.height(), |x, y| {
         noise.apply(&seed, &[x as f64, y as f64]) as f32
-    });
+    }));
     normalise(&mut rand_map);
 
     for (value, noise) in map.iter_mut().zip(rand_map.iter()) {
@@ -103,9 +100,7 @@ fn randomize_elevation(map: &mut Wrapping2DArray<f32>) {
 }
 
 /// Simulates ocean flow, based on initial flow data and land data
-fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>,
-    flow_data: &mut Wrapping2DArray<Vec2<f32>>)
-{
+fn simulate_ocean_flow(land_data: &WrappingGrid<f32>, flow_data: &mut WrappingGrid<Vec2<f32>>) {
     // A list of the possible adjacent tiles
     static ADJ: [(i32, i32); 9] =
             [(-1, -1), ( 0, -1), ( 1, -1),
@@ -119,13 +114,14 @@ fn simulate_ocean_flow(land_data: &Wrapping2DArray<f32>,
     for _ in 0..25 {
         // !!! FIXME: This is not very realistic, and limits how much the flow data can change as a
         // result of other factors.
-        let mut old = Wrapping2DArray::from_fn(flow_data.width(), flow_data.height(),
-                |x, y| source_flow[(x, y)].scale(0.1));
+        let mut old = WrappingGrid::new(Grid::from_fn(flow_data.width(), flow_data.height(),
+            |x, y| source_flow[(x as i32, y as i32)].scale(0.1)
+        ));
 
         mem::swap(flow_data, &mut old);
 
-        for x in (0..old.width()) {
-            for y in (0..old.height()) {
+        for x in (0 .. old.width() as i32) {
+            for y in (0 .. old.height() as i32) {
                 // No water on this square
                 if old[(x, y)].length_sqr() == 0.0 {
                     continue;
@@ -202,8 +198,8 @@ fn radial_fade(circle: Circle, point: Vec2<f32>) -> f32 {
     else { 1.0 - dist / circle.radius }
 }
 
-fn flood_fill_if_less<A, B>(target: &mut Wrapping2DArray<A>, check: &Wrapping2DArray<B>, thres: B,
-    source: &Wrapping2DArray<A>, x: i32, y: i32)
+fn flood_fill_if_less<A, B>(target: &mut WrappingGrid<A>, check: &WrappingGrid<B>, thres: B,
+    source: &WrappingGrid<A>, x: i32, y: i32)
     where A: Clone + PartialEq,
           B: Clone + PartialOrd
 {
@@ -222,14 +218,14 @@ fn flood_fill_if_less<A, B>(target: &mut Wrapping2DArray<A>, check: &Wrapping2DA
             target[(x, y)] = source[(x, y)].clone();
 
             if y > 0 { active.push((x, y-1)); }
-            if y+1 < check.height() { active.push((x, y+1)); }
+            if y+1 < check.height() as i32 { active.push((x, y+1)); }
             if x > 0 { active.push((x-1, y)); }
-            if x+1 < check.width() { active.push((x+1, y)); }
+            if x+1 < check.width() as i32 { active.push((x+1, y)); }
         }
     }
 }
 
-pub fn normalise(target: &mut Wrapping2DArray<f32>) {
+pub fn normalise(target: &mut Grid<f32>) {
     let mut min = target[(0, 0)];
     let mut max = target[(0, 0)];
 
@@ -247,12 +243,12 @@ pub fn normalise(target: &mut Wrapping2DArray<f32>) {
     }
 }
 
-fn upscale<T>(input: &Wrapping2DArray<T>, scale: i32) -> Wrapping2DArray<T>
+fn upscale<T>(input: &Grid<T>, scale: usize) -> Grid<T>
     where T: Interpolate
 {
-    Wrapping2DArray::from_fn(input.width() * scale, input.height() * scale, |x, y| {
-        let in_x = (x / scale) as i32;
-        let in_y = (y / scale) as i32;
+    Grid::from_fn(input.width() * scale, input.height() * scale, |x, y| {
+        let in_x = x / scale;
+        let in_y = y / scale;
 
         let values = [
             [input[(in_x, in_y)].clone(), input[(in_x, in_y + 1)].clone()],

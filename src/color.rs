@@ -1,4 +1,4 @@
-use math::interpolate::Interpolate;
+use interpolate::Interpolate;
 
 /// An RGB color
 #[derive(Copy, Clone)]

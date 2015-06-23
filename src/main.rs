@@ -1,5 +1,6 @@
 #![feature(core)]
-
+extern crate interpolate;
+extern crate basic2d;
 extern crate bitmap;
 extern crate noise;
 extern crate rand;
@@ -9,15 +10,13 @@ use std::io;
 use std::fs::File;
 
 use bitmap::Bitmap;
-use wrapping2darray::Wrapping2DArray;
+use basic2d::Grid;
 
-mod math;
 mod color;
-mod wrapping2darray;
 mod mapgen;
 
 fn main() {
-    const SIZE: i32 = 256*2;
+    const SIZE: usize = 256*2;
     let test = mapgen::UpperMap::new(SIZE, SIZE);
 
     println!("Saving elevation map");
@@ -52,8 +51,8 @@ fn elevation_bitmap(map: &mapgen::UpperMap, filename: &str) -> io::Result<()> {
 }
 /// Produce a flow bitmap
 fn flow_bitmap(map: &mapgen::UpperMap, filename: &str) -> io::Result<()> {
-    let mut len_map = Wrapping2DArray::from_fn(map.ocean_flow.width(), map.ocean_flow.height(),
-            |x, y| map.ocean_flow[(x, y)].length());
+    let mut len_map = Grid::from_fn(map.ocean_flow.width(), map.ocean_flow.height(),
+            |x, y| map.ocean_flow[(x as i32, y as i32)].length());
     mapgen::normalise(&mut len_map);
 
     let mut bitmap = Bitmap::new(map.ocean_flow.width() as i32, map.ocean_flow.height() as i32);
