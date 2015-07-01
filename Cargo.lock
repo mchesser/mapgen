@@ -6,17 +6,17 @@ dependencies = [
  "bitmap 0.0.3 (git+https://github.com/quvarxa/bitmap.git)",
  "interpolate 0.1.0 (git+https://github.com/quvarxa/interpolate.git)",
  "noise 0.1.5 (git+https://github.com/bjz/noise-rs)",
- "num 0.1.24 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num 0.1.25 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "basic2d"
 version = "0.0.2"
-source = "git+https://github.com/quvarxa/basic2d.git#d31ccc34eb68f12a0e9e8d9ae67c1db59eaac7e7"
+source = "git+https://github.com/quvarxa/basic2d.git#6806246fb80e5f1c968786d0764b65272d5561d8"
 dependencies = [
  "interpolate 0.1.0 (git+https://github.com/quvarxa/interpolate.git)",
- "num 0.1.24 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num 0.1.25 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -27,7 +27,7 @@ source = "git+https://github.com/quvarxa/bitmap.git#2a04c902807cc9dda3e64a3a94ba
 [[package]]
 name = "interpolate"
 version = "0.1.0"
-source = "git+https://github.com/quvarxa/interpolate.git#4a53e4f06c292ba793db8c3c6ed76a6bac9fbbe0"
+source = "git+https://github.com/quvarxa/interpolate.git#d055123f61d1b145c2cf464fab7be0fa354f46dc"
 
 [[package]]
 name = "libc"
@@ -39,17 +39,17 @@ name = "noise"
 version = "0.1.5"
 source = "git+https://github.com/bjz/noise-rs#d46df3fd9e37000a45fa76aad3fcdb85f4967318"
 dependencies = [
- "num 0.1.24 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num 0.1.25 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "num"
-version = "0.1.24"
+version = "0.1.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "rand 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "rustc-serialize 0.3.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rustc-serialize 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -62,6 +62,6 @@ dependencies = [
 
 [[package]]
 name = "rustc-serialize"
-version = "0.3.14"
+version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 

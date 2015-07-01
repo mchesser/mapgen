@@ -1,4 +1,3 @@
-#![feature(core)]
 extern crate interpolate;
 extern crate basic2d;
 extern crate bitmap;
@@ -10,7 +9,6 @@ use std::io;
 use std::fs::File;
 
 use bitmap::Bitmap;
-use basic2d::Grid;
 
 mod color;
 mod mapgen;
@@ -21,9 +19,6 @@ fn main() {
 
     println!("Saving elevation map");
     elevation_bitmap(&test, "elevation.bmp").unwrap();
-
-    println!("Saving flow map");
-    flow_bitmap(&test, "flow.bmp").unwrap();
 }
 
 /// Produce an elevation bitmap
@@ -49,29 +44,4 @@ fn elevation_bitmap(map: &mapgen::UpperMap, filename: &str) -> io::Result<()> {
     let mut file = try!(File::create(filename));
     bitmap.write(&mut file)
 }
-/// Produce a flow bitmap
-fn flow_bitmap(map: &mapgen::UpperMap, filename: &str) -> io::Result<()> {
-    let mut len_map = Grid::from_fn(map.ocean_flow.width(), map.ocean_flow.height(),
-            |x, y| map.ocean_flow[(x as i32, y as i32)].length());
-    mapgen::normalise(&mut len_map);
 
-    let mut bitmap = Bitmap::new(map.ocean_flow.width() as i32, map.ocean_flow.height() as i32);
-
-    let land_colors = [color::consts::BEAVER, color::consts::BUFF];
-    let sea_colors = [color::consts::AZURE, color::consts::BLACK];
-
-    for (idx, (flow, elev)) in len_map.iter().zip(map.elevation.iter()).enumerate() {
-        let x = idx as i32 % bitmap.width();
-        let y = idx as i32 / bitmap.width();
-
-        if *elev >= 0.0 {
-            bitmap.set_pixel(x, y, color::linear_gradient(&land_colors, *elev as f64).to_tuple());
-        }
-        else {
-            bitmap.set_pixel(x, y, color::linear_gradient(&sea_colors, *flow as f64).to_tuple());
-        }
-    }
-
-    let mut file = try!(File::create(filename));
-    bitmap.write(&mut file)
-}
