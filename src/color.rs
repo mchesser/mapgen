@@ -16,10 +16,14 @@ impl Rgb {
 
 impl Interpolate for Rgb {
     fn lerp(v: [Rgb; 2], x: f64) -> Rgb {
+        fn blend(a: u8, b: u8, x: f64) -> u8 {
+            Interpolate::lerp([a as f32 * a as f32, b as f32 * b as f32], x).sqrt() as u8
+        }
+
         Rgb {
-            r: Interpolate::lerp([v[0].r, v[1].r], x),
-            g: Interpolate::lerp([v[0].g, v[1].g], x),
-            b: Interpolate::lerp([v[0].b, v[1].b], x)
+            r: blend(v[0].r, v[1].r, x),
+            g: blend(v[0].g, v[1].g, x),
+            b: blend(v[0].b, v[1].b, x),
         }
     }
 }
@@ -35,6 +39,7 @@ pub mod consts {
     pub const BEAVER:      Rgb = Rgb { r: 0x9F, g: 0x81, b: 0x70 };
     pub const BLACK:       Rgb = Rgb { r: 0x00, g: 0x00, b: 0x00 };
     pub const BLUE:        Rgb = Rgb { r: 0x00, g: 0x00, b: 0xFF };
+    pub const SKY_BLUE:    Rgb = Rgb { r: 0x87, g: 0xCE, b: 0xEB };
     pub const BRONZE:      Rgb = Rgb { r: 0xCD, g: 0x7F, b: 0x32 };
     pub const BROWN:       Rgb = Rgb { r: 0x96, g: 0x4B, b: 0x00 };
     pub const BUFF:        Rgb = Rgb { r: 0xF0, g: 0xDC, b: 0x82 };
@@ -85,4 +90,12 @@ pub fn linear_gradient(colors: &[Rgb], x: f64) -> Rgb {
     let c2 = c1 + 1;
     let x_new = 1.0 - (x * band_width - (c1 as f64));
     Interpolate::lerp([colors[c2], colors[c1]], x_new)
+}
+
+
+/// Apply a linear gradient over a color map, with the number of possible different colors
+/// reduced to the number specified by `num_colors`.
+pub fn reduced_gradient(colors: &[Rgb], x: f64, num_colors: f64) -> Rgb {
+    let new_x = (x * (num_colors as f64)).round() / num_colors;
+    linear_gradient(colors, new_x)
 }
