@@ -43,7 +43,7 @@ impl UpperMap {
             .filter(|&(_, &mut e)| e < 0.0)
         {
             let (x, y) = (x as f32, y as f32);
-            let (land_x, land_y) = coastline_map.find_closest(&(x, y)).unwrap();
+            let (land_x, land_y) = coastline_map.find_nearest(&(x, y)).unwrap();
 
 			let dist = Vec2::new(x - land_x, y - land_y).length();
             *tile *= (dist / (width as f32 * 0.5)).powf(0.3);

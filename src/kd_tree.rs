@@ -14,10 +14,10 @@ pub trait VectorObject {
     /// Return the coordinate along a particular axis
     fn coordinate(&self, axis: usize) -> Self::ScalarType;
 
-    /// Return the distance between two objects
-    fn dist(&self, other: &Self) -> Self::ScalarType;
+    /// Return the distance squared between two objects
+    fn dist_sqr(&self, other: &Self) -> Self::ScalarType;
 
-    /// Return the distance between two objects along a particular axis
+    /// Return the squared distance between two objects along a particular axis
     fn dist_axis(&self, other: &Self, axis: usize) -> Self::ScalarType;
 }
 
@@ -36,12 +36,13 @@ impl VectorObject for (f32, f32) {
         }
     }
 
-    fn dist(&self, other: &Self) -> f32 {
-        ((self.0 - other.0).powf(2.0) + (self.1 - other.1).powf(2.0)).sqrt()
+    fn dist_sqr(&self, other: &Self) -> f32 {
+        (self.0 - other.0).powf(2.0) + (self.1 - other.1).powf(2.0)
     }
 
     fn dist_axis(&self, other: &Self, axis: usize) -> f32 {
-        (self.coordinate(axis) - other.coordinate(axis)).abs()
+        let dist = (self.coordinate(axis) - other.coordinate(axis)).abs();
+		dist * dist
     }
 }
 
@@ -67,7 +68,7 @@ enum KdTreeNode<T> where T: VectorObject {
 }
 
 impl<T> KdTreeNode<T> where T: VectorObject + Clone {
-    fn find_closest(&self, query: &T, best: Option<T>) -> Option<T> {
+    fn find_nearest(&self, query: &T, best: Option<T>) -> Option<T> {
         match self {
             &KdTreeNode::Branch(ref branch) => {
                 let axis = branch.split_axis;
@@ -80,11 +81,11 @@ impl<T> KdTreeNode<T> where T: VectorObject + Clone {
                     }
                 };
 
-                let best = near.find_closest(query, best.clone());
+                let best = near.find_nearest(query, best.clone());
                 let lower_bound = branch.split_val.dist_axis(query, axis);
 
-                if best.as_ref().map(|x| lower_bound < x.dist(query)).unwrap_or(true) {
-                    far.find_closest(query, best)
+                if best.as_ref().map(|x| lower_bound < x.dist_sqr(query)).unwrap_or(true) {
+                    far.find_nearest(query, best)
                 }
                 else {
                     best
@@ -94,7 +95,7 @@ impl<T> KdTreeNode<T> where T: VectorObject + Clone {
 
             &KdTreeNode::Leaf(ref leaf) => {
                 min_option_by(best.clone(), leaf.as_ref().map(|x| (**x).clone()), |a, b| {
-                    a.dist(query) < b.dist(query)
+                    a.dist_sqr(query) < b.dist_sqr(query)
                 })
             },
         }
@@ -112,7 +113,7 @@ pub struct KdTree<T> where T: VectorObject {
     root: KdTreeNode<T>,
 }
 
-impl<T> KdTree<T> where T: VectorObject + Clone{
+impl<T> KdTree<T> where T: VectorObject + Clone {
     /// Create a new Kd-tree given a slice of objects to include in the tree.
     ///
     /// This function modifies the order of the objects in the tree.
@@ -128,8 +129,8 @@ impl<T> KdTree<T> where T: VectorObject + Clone{
     }
 
     /// Find the nearest point in the kd-tree to a given query point
-    pub fn find_closest(&self, query: &T) -> Option<T> {
-        self.root.find_closest(query, None)
+    pub fn find_nearest(&self, query: &T) -> Option<T> {
+        self.root.find_nearest(query, None)
     }
 }
 
