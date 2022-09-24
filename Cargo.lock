@@ -11,10 +11,10 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 [[package]]
 name = "basic2d"
 version = "0.0.2"
-source = "git+https://github.com/mchesser/basic2d.git#3c8d23f32c292d70e9b48071383e73a46b1b9226"
+source = "git+https://github.com/mchesser/basic2d.git#2ab4cd72d77c28651e4e57d1efab9942665992df"
 dependencies = [
- "interpolate 0.1.0 (git+https://github.com/quvarxa/interpolate.git)",
- "num",
+ "interpolate",
+ "num-traits",
 ]
 
 [[package]]
@@ -42,12 +42,7 @@ dependencies = [
 [[package]]
 name = "interpolate"
 version = "0.1.0"
-source = "git+https://github.com/mchesser/interpolate.git#f62085480a2ba98426a541466f9410406dc56020"
-
-[[package]]
-name = "interpolate"
-version = "0.1.0"
-source = "git+https://github.com/quvarxa/interpolate.git#f62085480a2ba98426a541466f9410406dc56020"
+source = "git+https://github.com/mchesser/interpolate.git#77cf8caa2aa48c1858a06e2f0bd889f01067ec28"
 
 [[package]]
 name = "libc"
@@ -61,7 +56,7 @@ version = "0.0.1"
 dependencies = [
  "basic2d",
  "bitmap",
- "interpolate 0.1.0 (git+https://github.com/mchesser/interpolate.git)",
+ "interpolate",
  "noise",
  "num-traits",
 ]
@@ -74,73 +69,6 @@ checksum = "82051dd6745d5184c6efb7bc8be14892a7f6d4f3ad6dbf754d1c7d7d5fe24b43"
 dependencies = [
  "rand",
  "rand_xorshift",
-]
-
-[[package]]
-name = "num"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43db66d1170d347f9a065114077f7dccb00c1b9478c89384490a3425279a4606"
-dependencies = [
- "num-bigint",
- "num-complex",
- "num-integer",
- "num-iter",
- "num-rational",
- "num-traits",
-]
-
-[[package]]
-name = "num-bigint"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f93ab6289c7b344a8a9f60f88d80aa20032336fe78da341afc91c8a2341fc75f"
-dependencies = [
- "autocfg",
- "num-integer",
- "num-traits",
-]
-
-[[package]]
-name = "num-complex"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ae39348c8bc5fbd7f40c727a9925f03517afd2ab27d46702108b6a7e5414c19"
-dependencies = [
- "num-traits",
-]
-
-[[package]]
-name = "num-integer"
-version = "0.1.45"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "225d3389fb3509a24c93f5c29eb6bde2586b98d9f016636dff58d7c6f7569cd9"
-dependencies = [
- "autocfg",
- "num-traits",
-]
-
-[[package]]
-name = "num-iter"
-version = "0.1.43"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d03e6c028c5dc5cac6e2dec0efda81fc887605bb3d884578bb6d6bf7514e252"
-dependencies = [
- "autocfg",
- "num-integer",
- "num-traits",
-]
-
-[[package]]
-name = "num-rational"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0638a1c9d0a3c0914158145bc76cff373a75a627e6ecbfb71cbe6f453a5a19b0"
-dependencies = [
- "autocfg",
- "num-bigint",
- "num-integer",
- "num-traits",
 ]
 
 [[package]]
