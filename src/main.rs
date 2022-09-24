@@ -1,22 +1,15 @@
-extern crate interpolate;
-extern crate basic2d;
-extern crate bitmap;
-extern crate noise;
-extern crate rand;
-extern crate num;
-
-use std::io;
 use std::fs::File;
+use std::io;
 
 use bitmap::Bitmap;
 use color::reduced_gradient;
 
 mod color;
-mod mapgen;
 mod kd_tree;
+mod mapgen;
 
 fn main() {
-    const SIZE: usize = 256*2;
+    const SIZE: usize = 256 * 2;
     let test = mapgen::UpperMap::new(SIZE, SIZE);
 
     println!("Saving elevation map");
@@ -42,8 +35,7 @@ fn elevation_bitmap(map: &mapgen::UpperMap, filename: &str) -> io::Result<()> {
             bitmap.set_pixel(x, y, reduced_gradient(&sea_colors, -h as f64, 15.0).to_tuple());
         }
     }
-    
-    let mut file = try!(File::create(filename));
+
+    let mut file = File::create(filename)?;
     bitmap.write(&mut file)
 }
-

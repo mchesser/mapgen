@@ -2,19 +2,11 @@
 name = "mapgen"
 version = "0.0.1"
 authors = ["Michael Chesser"]
-
-[dependencies.bitmap]
-git = "https://github.com/quvarxa/bitmap.git"
-
-[dependencies.noise]
-git = "https://github.com/bjz/noise-rs"
-
-[dependencies.interpolate]
-git = "https://github.com/quvarxa/interpolate.git"
-
-[dependencies.basic2d]
-git = "https://github.com/quvarxa/basic2d.git"
+edition = "2021"
 
 [dependencies]
-rand = "*"
-num = "*"
+bitmap = { git = "https://github.com/mchesser/bitmap.git" }
+interpolate = { git = "https://github.com/mchesser/interpolate.git" }
+basic2d = { git = "https://github.com/mchesser/basic2d.git" }
+noise = { version = "0.7.0", default-features = false }
+num-traits = "0.2.15"
